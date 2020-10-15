@@ -10,22 +10,6 @@ USE universidad;
 #------------------------------------------------------------------------------------
 # Creacion de tablas para las entidades
 
-CREATE TABLE inscripciones(
-	codigo_inscripcion VARCHAR(45) NOT NULL,
-	fecha DATE NOT NULL DEFAULT '2020-01-01',
-    
-    
-    CONSTRAINT pk_inscripciones
-    PRIMARY KEY (codigo),
-	
-	CONSTRAINT fk_inscripciones_alumnos
-	FOREIGN KEY (LU) REFERENCES alumnos(LU)
-	ON DELETE RESTRICT ON UPDATE CASCADE
-	
-	
-    
-) ENGINE=InnoDB;
-
 CREATE TABLE alumnos(
 	LU INT unsigned NOT NULL,
 	doc_tipo VARCHAR(45) NOT NULL,
@@ -50,15 +34,6 @@ CREATE TABLE datos_de_contactos(
 
     
 	CONSTRAINT pk_datos_de_contactos
-	PRIMARY KEY()
-    
-) ENGINE=InnoDB;
-
-CREATE TABLE notas(
-	puntaje INT unsigned NOT NULL,
-	estado VARCHAR(45) NOT NULL,
-    
-	CONSTRAINT pk_notas
 	PRIMARY KEY()
     
 ) ENGINE=InnoDB;
@@ -106,17 +81,38 @@ CREATE TABLE materias(
 #-------------------------------------------------------------------------
 # Creación Tablas para las relaciones
 
+CREATE TABLE inscripciones(
+	codigo_inscripcion VARCHAR(45) NOT NULL,
+	fecha DATE NOT NULL DEFAULT '2020-01-01',
+	LU INT unsigned NOT NULL,
+	nombre VARCHAR(45) NOT NULL,
+    
+    
+    CONSTRAINT pk_inscripciones
+    PRIMARY KEY (codigo_inscripcion),
+	
+	CONSTRAINT fk_inscripciones_alumnos
+	FOREIGN KEY (LU) REFERENCES alumnos(LU)
+	ON DELETE RESTRICT ON UPDATE CASCADE,
+	
+	CONSTRAINT fk_inscripciones_carreras
+	FOREIGN KEY (nombre) REFERENCES carreras (nombre)
+	ON DELETE RESTRICT ON UPDATE CASCADE
+	
+    
+) ENGINE=InnoDB;
+
 CREATE TABLE planes(
 	nombre VARCHAR(45) NOT NULL,
 	id INT unsigned NOT NULL,
 
 	PRIMARY KEY (nombre,id),
 
-	CONSTRAINT pk_planes_carreras
+	CONSTRAINT fk_planes_carreras
 	FOREIGN KEY (nombre) REFERENCES carreras (nombre)
 	ON DELETE RESTRICT ON UPDATE CASCADE,
 	
-	CONSTRAINT pk_planes_materias
+	CONSTRAINT fk_planes_materias
 	FOREIGN KEY (id) REFERENCES materias (id)
 	ON DELETE RESTRICT ON UPDATE CASCADE
     
@@ -128,13 +124,32 @@ CREATE TABLE correlativas(
 	
 	PRIMARY KEY (id_materias,id_correlativas),
 
-	CONSTRAINT pk_correlativas_materias
+	CONSTRAINT fk_correlativas_materias
 	FOREIGN KEY (id_materias) REFERENCES materias (id)
-	ON DELETE RESTRICT ON UPDATE CASCADE,
+	ON DELETE RESTRICT ON UPDATE CASCADE
 	
 	
 	#es una relacion reflexiva de correlativas y materias ya q son lo mismo
 	
+) ENGINE=InnoDB;
+
+CREATE TABLE notas(
+	puntaje INT unsigned NOT NULL,
+	estado VARCHAR(45) NOT NULL,
+	id_materias INT unsigned NOT NULL,
+	LU INT unsigned NOT NULL,
+    
+	CONSTRAINT pk_notas
+	PRIMARY KEY(LU,id),
+	
+	CONSTRAINT fk_inscripciones_alumnos
+	FOREIGN KEY (LU) REFERENCES alumnos(LU)
+	ON DELETE RESTRICT ON UPDATE CASCADE,
+	
+	CONSTRAINT fk_correlativas_materias
+	FOREIGN KEY (id_materias) REFERENCES materias (id)
+	ON DELETE RESTRICT ON UPDATE CASCADE
+    
 ) ENGINE=InnoDB;
 	
 
