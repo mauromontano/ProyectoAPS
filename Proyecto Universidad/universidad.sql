@@ -47,6 +47,18 @@ CREATE TABLE carreras(
     
 ) ENGINE=InnoDB;
 
+CREATE TABLE planes(
+	nombre_carrera VARCHAR(45) NOT NULL,
+	id_plan INT unsigned NOT NULL,
+
+	PRIMARY KEY (nombre_carrera,id_plan),
+
+	CONSTRAINT fk_planes_carreras
+	FOREIGN KEY (nombre) REFERENCES carreras (nombre)
+	ON DELETE RESTRICT ON UPDATE CASCADE,
+    
+) ENGINE=InnoDB;
+
 CREATE TABLE profesores(
 	matricula INT unsigned NOT NULL,
 	doc_tipo VARCHAR(45) NOT NULL,
@@ -99,22 +111,6 @@ CREATE TABLE inscripciones(
 	FOREIGN KEY (nombre) REFERENCES carreras (nombre)
 	ON DELETE RESTRICT ON UPDATE CASCADE
 	
-    
-) ENGINE=InnoDB;
-
-CREATE TABLE planes(
-	nombre VARCHAR(45) NOT NULL,
-	id INT unsigned NOT NULL,
-
-	PRIMARY KEY (nombre,id),
-
-	CONSTRAINT fk_planes_carreras
-	FOREIGN KEY (nombre) REFERENCES carreras (nombre)
-	ON DELETE RESTRICT ON UPDATE CASCADE,
-	
-	CONSTRAINT fk_planes_materias
-	FOREIGN KEY (id) REFERENCES materias (id)
-	ON DELETE RESTRICT ON UPDATE CASCADE
     
 ) ENGINE=InnoDB;
 
