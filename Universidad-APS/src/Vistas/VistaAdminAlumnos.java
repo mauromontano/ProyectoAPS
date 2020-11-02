@@ -25,24 +25,24 @@ import Conector.ConectorBD;
 import quick.dbtable.DBTable;
 
 
-public class VistaAlumnos extends JPanel {
+public class VistaAdminAlumnos extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
-	private static VistaAlumnos instancia = null;
+	private static VistaAdminAlumnos instancia = null;
 	private DBTable tabla;
 	private JTextField txtNombre;
 	protected int seleccionado = -1;
 	
 	
-	public static VistaAlumnos obtenerVistaAlumnos () {
+	public static VistaAdminAlumnos obtenerVistaAdminAlumnos () {
 		if (instancia == null) {
-			instancia = new VistaAlumnos();
+			instancia = new VistaAdminAlumnos();
 		}
 		return instancia;
 	}
 	
 	// CONSTRUCTOR: Vista de alumnos	
-	private VistaAlumnos() {
+	private VistaAdminAlumnos() {
 		
 		this.setBackground(SystemColor.control);
 		this.setBounds(0, 0, 1194, 699);
@@ -107,7 +107,7 @@ public class VistaAlumnos extends JPanel {
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		setVisible(false);
-        		VistaPrincipal.obtenerVistaPrincipal().setVisible(true);
+        		VistaAdmin.obtenerVistaAdmin().setVisible(true);
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));

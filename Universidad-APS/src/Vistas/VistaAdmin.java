@@ -9,23 +9,34 @@ import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
 
-public class VistaPrincipal extends JPanel {
+public class VistaAdmin extends JPanel {
 		
 	
 	private static final long serialVersionUID = 1L;
-	private static VistaPrincipal instancia = null;
+	private static VistaAdmin instancia = null;
 	
 	
-	public static VistaPrincipal obtenerVistaPrincipal () {
+	public static VistaAdmin obtenerVistaAdmin () {
 		
 		if (instancia == null) {
-			instancia = new VistaPrincipal();
+			instancia = new VistaAdmin();
 		}
 		return instancia;
 	}
 	
 	
-	private VistaPrincipal() {
+	private VistaAdmin() {
+		
+		JButton btnAtras = new JButton("Atr\u00E1s");
+        btnAtras.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		setVisible(false);
+        		VistaInicio.obtenerVistaInicio().setVisible(true);
+        	}
+        });
+        btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+        btnAtras.setBounds(10, 11, 70, 23);
+        add(btnAtras);
 				
 		this.setBorder(new LineBorder(SystemColor.activeCaptionBorder));
 		this.setBackground(SystemColor.menu);
@@ -38,7 +49,7 @@ public class VistaPrincipal extends JPanel {
 		btnSecAlumnos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				setVisible(false);
-				VistaAlumnos.obtenerVistaAlumnos().setVisible(true);
+				VistaAdminAlumnos.obtenerVistaAdminAlumnos().setVisible(true);
 			}
 		});
 		this.add(btnSecAlumnos);

@@ -89,7 +89,7 @@ public class VistaCarreras extends JPanel {
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		setVisible(false);
-        		VistaPrincipal.obtenerVistaPrincipal().setVisible(true);
+        		VistaAdmin.obtenerVistaAdmin().setVisible(true);
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
