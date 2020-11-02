@@ -34,7 +34,7 @@ public class VistaAdminAlumnos extends JPanel {
 	protected int seleccionado = -1;
 	
 	
-	public static VistaAdminAlumnos obtenerVistaAdminAlumnos () {
+	public static VistaAdminAlumnos vista () {
 		if (instancia == null) {
 			instancia = new VistaAdminAlumnos();
 		}
@@ -107,7 +107,7 @@ public class VistaAdminAlumnos extends JPanel {
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		setVisible(false);
-        		VistaAdmin.obtenerVistaAdmin().setVisible(true);
+        		VistaAdmin.vista().setVisible(true);
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));

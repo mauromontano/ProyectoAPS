@@ -26,24 +26,24 @@ import java.awt.event.ActionEvent;
 import quick.dbtable.DBTable;
 
 
-public class VistaMaterias extends JPanel {
+public class VistaAdminMaterias extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
-	private static VistaMaterias instancia = null;
+	private static VistaAdminMaterias instancia = null;
 	private DBTable tabla;
 	private JTextField txtNombre;
 	protected int seleccionado = -1;
 	
 	
-	public static VistaMaterias obtenerVistaMaterias () {
+	public static VistaAdminMaterias vista () {
 		if (instancia == null) {
-			instancia = new VistaMaterias();
+			instancia = new VistaAdminMaterias();
 		}
 		return instancia;
 	}
 	
 	// CONSTRUCTOR: Vista de materias	
-	private VistaMaterias() {
+	private VistaAdminMaterias() {
 		
 		this.setBackground(SystemColor.control);
 		this.setBounds(0, 0, 1194, 699);
@@ -107,7 +107,7 @@ public class VistaMaterias extends JPanel {
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		setVisible(false);
-        		VistaAdmin.obtenerVistaAdmin().setVisible(true);
+        		VistaAdmin.vista().setVisible(true);
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
@@ -137,15 +137,13 @@ public class VistaMaterias extends JPanel {
 	}
 	
 	
-	private void seleccionarFila()
-	{
+	private void seleccionarFila() {
 		this.seleccionado = this.tabla.getSelectedRow();
 	    this.txtNombre.setText(this.tabla.getValueAt(this.tabla.getSelectedRow(), 0).toString());
 	}
 	
 	
-	private void conectarBD()
-	   {
+	private void conectarBD() {
 	         try
 	         {
 	            String driver ="com.mysql.cj.jdbc.Driver";

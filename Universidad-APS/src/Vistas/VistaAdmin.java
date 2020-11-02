@@ -8,6 +8,8 @@ import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.border.LineBorder;
 
+import Controladores.ControladorVistas;
+
 
 public class VistaAdmin extends JPanel {
 		
@@ -16,7 +18,7 @@ public class VistaAdmin extends JPanel {
 	private static VistaAdmin instancia = null;
 	
 	
-	public static VistaAdmin obtenerVistaAdmin () {
+	public static VistaAdmin vista () {
 		
 		if (instancia == null) {
 			instancia = new VistaAdmin();
@@ -31,7 +33,7 @@ public class VistaAdmin extends JPanel {
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		setVisible(false);
-        		VistaInicio.obtenerVistaInicio().setVisible(true);
+        		VistaInicio.vista().setVisible(true);
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
@@ -48,8 +50,8 @@ public class VistaAdmin extends JPanel {
 		btnSecAlumnos.setBounds(102, 43, 160, 31);
 		btnSecAlumnos.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-				VistaAdminAlumnos.obtenerVistaAdminAlumnos().setVisible(true);
+				// Swap a la vista de administración de alumnos
+				ControladorVistas.controlador().mostrar(VistaAdminAlumnos.vista());
 			}
 		});
 		this.add(btnSecAlumnos);
@@ -59,8 +61,8 @@ public class VistaAdmin extends JPanel {
 		btnSecCarreras.setBounds(102, 85, 160, 31);
 		btnSecCarreras.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-				VistaCarreras.obtenerVistaCarreras().setVisible(true);
+				// Swap a la vista de administración de materias
+				ControladorVistas.controlador().mostrar(VistaAdminCarreras.vista());
 			}
 		});
 		this.add(btnSecCarreras);
@@ -70,8 +72,8 @@ public class VistaAdmin extends JPanel {
 		btnSecMaterias.setBounds(102, 169, 160, 31);
 		btnSecMaterias.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-				VistaMaterias.obtenerVistaMaterias().setVisible(true);
+				// Swap a la vista de administración de materias
+				ControladorVistas.controlador().mostrar(VistaAdminMaterias.vista());
 			}
 		});
 		this.add(btnSecMaterias);
@@ -81,8 +83,8 @@ public class VistaAdmin extends JPanel {
 		btnSecPlanes.setBounds(102, 127, 160, 31);
 		btnSecPlanes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				setVisible(false);
-				VistaPlanes.obtenerVistaPlanes().setVisible(true);
+				// Swap a la vista de administración de planes
+				ControladorVistas.controlador().mostrar(VistaAdminPlanes.vista());
 			}
 		});
 		this.add(btnSecPlanes);

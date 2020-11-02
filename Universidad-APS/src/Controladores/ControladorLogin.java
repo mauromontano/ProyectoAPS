@@ -1,4 +1,5 @@
 package Controladores;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -8,14 +9,16 @@ import Modelos.Alumno;
 import Modelos.Profesor;
 import Vistas.VistaAdmin;
 import Vistas.VistaAlumno;
-import Vistas.VistaInicio;
 import Vistas.VistaProfesor;
 
 public class ControladorLogin {
 	
 	private static ControladorLogin instancia = null;
 	
-	
+	/**
+	 * controlador: retorna la instancia asociada al controlador
+	 * @return panel de la vista inicial
+	 */
 	public static ControladorLogin controlador () {
 		if (instancia == null) {
 			instancia = new ControladorLogin();
@@ -23,19 +26,25 @@ public class ControladorLogin {
 		return instancia;
 	}
 	
+	/**
+	 * login: lleva adelante el acceso de un usuario de, cierta categoría, a su home.
+	 * @param cat: cadena de caracteres asociada a la categoría del usuario que desea acceder a su home.
+	 * @param us: cadena de caracteres asociada al id del usuario que desea acceder a su home.
+	 * @param ps: arreglo de chars asociado a la contraseña del usuario que desea acceder a su home.
+	 * @throws ExcepcionAutenticacion: cuando los datos ingresados para la autenticación son inválidos.
+	 */
 	public void login (String cat, String us, char [] ps) throws ExcepcionAutenticacion {
 		String pswd = new String(ps);
-		
+		boolean formatoInvalido = false;
 		// Si el usuario es administrador, accedo a su correspondiente vista
 		if (cat.contentEquals("Administrador")) {
 			if (us.contentEquals("admin_uni") && pswd.contentEquals("pwadmin")) {
-				VistaInicio.obtenerVistaInicio().setVisible(false);
-				VistaAdmin.obtenerVistaAdmin().setVisible(true);
+				// Solicito al controlador de vistas el swap a la vista home de administrador
+				ControladorVistas.controlador().mostrar(VistaAdmin.vista());
 			}
 			else 
 			{
-				throw new ExcepcionAutenticacion (
-						"Acceso fallido [Admin]: usuario o contraseña especificados son incorrectos.");
+				formatoInvalido = true;
 			}
 		}
 		
@@ -55,15 +64,13 @@ public class ControladorLogin {
 					ResultSet rs = stmt.executeQuery(consultaSQL);
 					if (rs.next()) {
 						Alumno alumno = Alumno.siguienteModelo(rs);
-						VistaAlumno.obtenerVistaAlumno().generarVistaAlumno(alumno);
-						// Activo la vista correspondiente y desactivo la actual
-						VistaInicio.obtenerVistaInicio().setVisible(false);
-						VistaAlumno.obtenerVistaAlumno().setVisible(true);
+						VistaAlumno.vista().generarVistaAlumno(alumno);
+						// Solicito al controlador de vistas el swap a la vista home de alumno
+						ControladorVistas.controlador().mostrar(VistaAlumno.vista());
 					}
 					else 
 					{
-						throw new ExcepcionAutenticacion (
-								"Acceso fallido [Alumno]: usuario o contraseña especificados son incorrectos.");
+						formatoInvalido = true;
 					}
 				}
 				else 
@@ -72,39 +79,28 @@ public class ControladorLogin {
 					ResultSet rs = stmt.executeQuery(consultaSQL);
 					if (rs.next()) {
 						Profesor profesor = Profesor.siguienteModelo(rs);
-						VistaProfesor.obtenerVistaProfesor().generarVistaProfesor(profesor);
+						VistaProfesor.vista().generarVistaProfesor(profesor);
 						// Activo la vista correspondiente y desactivo la actual
-						VistaInicio.obtenerVistaInicio().setVisible(false);
-						VistaProfesor.obtenerVistaProfesor().setVisible(true);
+						ControladorVistas.controlador().mostrar(VistaProfesor.vista());
 					}
 					else 
 					{
-						throw new ExcepcionAutenticacion (
-								"Acceso fallido [Profesor]: usuario o contraseña especificados son incorrectos.");
+						formatoInvalido = true;
 					}
 				}				
 				stmt.close();
 			}
 			catch (SQLException ex)
 			{
-				// en caso de error, se muestra la causa en la consola
-				System.out.println("SQLException: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("VendorError: " + ex.getErrorCode());
+				formatoInvalido = true;
 			}
 			
 			ConectorBD.obtenerConectorBD().desconectarBD();
+			
+			if (formatoInvalido) {
+				throw new ExcepcionAutenticacion("Acceso fallido: usuario o contraseña especificados son incorrectos.");
+			}
 		}
-	}
-	
-	
-	public void generarVistaAlumno () {
-		
-	}
-	
-	
-	public void generarVistaProfesor () {
-		
 	}
 
 }

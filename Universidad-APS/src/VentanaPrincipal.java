@@ -34,23 +34,23 @@ public class VentanaPrincipal extends JFrame {
 		
 		getContentPane().setLayout(null);
 		
-		getContentPane().add(VistaInicio.obtenerVistaInicio());
-		getContentPane().add(VistaAlumno.obtenerVistaAlumno());
-		getContentPane().add(VistaProfesor.obtenerVistaProfesor());
-		getContentPane().add(VistaAdmin.obtenerVistaAdmin());
-		getContentPane().add(VistaAdminAlumnos.obtenerVistaAdminAlumnos());
-		getContentPane().add(VistaCarreras.obtenerVistaCarreras());
-		getContentPane().add(VistaMaterias.obtenerVistaMaterias());
-		getContentPane().add(VistaPlanes.obtenerVistaPlanes());
+		getContentPane().add(VistaInicio.vista());
+		getContentPane().add(VistaAlumno.vista());
+		getContentPane().add(VistaProfesor.vista());
+		getContentPane().add(VistaAdmin.vista());
+		getContentPane().add(VistaAdminAlumnos.vista());
+		getContentPane().add(VistaAdminCarreras.vista());
+		getContentPane().add(VistaAdminMaterias.vista());
+		getContentPane().add(VistaAdminPlanes.vista());
 		
-		VistaInicio.obtenerVistaInicio().setVisible(true);
-		VistaAlumno.obtenerVistaAlumno().setVisible(false);
-		VistaProfesor.obtenerVistaProfesor().setVisible(false);
-		VistaAdmin.obtenerVistaAdmin().setVisible(false);
-		VistaAdminAlumnos.obtenerVistaAdminAlumnos().setVisible(false);
-		VistaCarreras.obtenerVistaCarreras().setVisible(false);
-		VistaMaterias.obtenerVistaMaterias().setVisible(false);
-		VistaPlanes.obtenerVistaPlanes().setVisible(false);				
+		VistaInicio.vista().setVisible(true);
+		VistaAlumno.vista().setVisible(false);
+		VistaProfesor.vista().setVisible(false);
+		VistaAdmin.vista().setVisible(false);
+		VistaAdminAlumnos.vista().setVisible(false);
+		VistaAdminCarreras.vista().setVisible(false);
+		VistaAdminMaterias.vista().setVisible(false);
+		VistaAdminPlanes.vista().setVisible(false);				
 		
 	}
 	

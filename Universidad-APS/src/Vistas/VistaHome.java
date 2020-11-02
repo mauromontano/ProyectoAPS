@@ -3,7 +3,6 @@ package Vistas;
 import java.awt.Dimension;
 
 import javax.swing.JButton;
-import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
@@ -36,7 +35,7 @@ public abstract class VistaHome extends JPanel {
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		setVisible(false);
-        		VistaInicio.obtenerVistaInicio().setVisible(true);
+        		VistaInicio.vista().setVisible(true);
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));

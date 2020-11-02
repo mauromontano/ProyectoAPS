@@ -31,7 +31,11 @@ public class VistaInicio extends JPanel {
 	private static VistaInicio instancia = null;
 	
 	
-	public static VistaInicio obtenerVistaInicio () {
+	/**
+	 * obtenerVista: retorna la instancia asociada a la vista inicial
+	 * @return panel de la vista inicial
+	 */
+	public static VistaInicio vista () {
 		
 		if (instancia == null) {
 			instancia = new VistaInicio();
@@ -39,7 +43,9 @@ public class VistaInicio extends JPanel {
 		return instancia;
 	}
 	
-	
+	/**
+	 * CONSTRUCTOR
+	 */
 	public VistaInicio() {
 		setBorder(new LineBorder(SystemColor.activeCaptionBorder));
 		this.setBounds(401, 199, 387, 280);
@@ -95,7 +101,9 @@ public class VistaInicio extends JPanel {
 		add(lblInicio);
 	}
 	
-	
+	/**
+	 * accederAlPerfil: permite llevar adelante el acceso al home del usuario adecuado
+	 */
 	public void accederAlPerfil () {
 		String categoria = (String) switchCategoria.getSelectedItem();
 		String usuario = inputUsuario.getText();
@@ -108,8 +116,8 @@ public class VistaInicio extends JPanel {
 		{
 			JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
 					   ex.getMessage(),
-					   "Fallo en la autenticación",
+					   "Fallo en la autenticación [" + categoria + "]",
 					   JOptionPane.ERROR_MESSAGE);
-		}	
+		}
 	}
 }

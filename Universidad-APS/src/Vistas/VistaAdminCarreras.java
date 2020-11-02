@@ -9,10 +9,6 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionListener;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -24,24 +20,23 @@ import Conector.ConectorBD;
 import quick.dbtable.DBTable;
 
 
-public class VistaPlanes extends JPanel {
+public class VistaAdminCarreras extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
-	private static VistaPlanes instancia = null;
+	private static VistaAdminCarreras instancia = null;
 	private DBTable tabla;
-	private JTextField txtNombre;
 	protected int seleccionado = -1;
 	
 	
-	public static VistaPlanes obtenerVistaPlanes () {
+	public static VistaAdminCarreras vista () {
 		if (instancia == null) {
-			instancia = new VistaPlanes();
+			instancia = new VistaAdminCarreras();
 		}
 		return instancia;
 	}
 	
 	// CONSTRUCTOR: Vista de alumnos	
-	private VistaPlanes() {
+	private VistaAdminCarreras() {
 		
 		this.setBackground(SystemColor.control);
 		this.setBounds(0, 0, 1194, 699);
@@ -52,101 +47,65 @@ public class VistaPlanes extends JPanel {
 		panelTabla.setBounds(10, 232, 1174, 456);
 		this.add(panelTabla);
 		
-		JButton btnRegPlan = new JButton("Registrar plan");
-		btnRegPlan.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 13));
-		btnRegPlan.addActionListener(new ActionListener() {
+		JButton btnRegCarrera = new JButton("Registrar carrera");
+		btnRegCarrera.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 13));
+		btnRegCarrera.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				new VentanaRegPlan();
+				new VentanaRegCarrera();
 			}
 		});
-		btnRegPlan.setBounds(328, 84, 167, 40);
-		this.add(btnRegPlan);
+		btnRegCarrera.setBounds(328, 84, 167, 40);
+		this.add(btnRegCarrera);
 		
 		tabla = new DBTable();
-		tabla.setBounds(446, 5, 275, 427);
+		tabla.setBounds(460, 5, 248, 427);
         
-		tabla.addKeyListener(new KeyAdapter() {
-           public void keyTyped(KeyEvent evt) {
-              tablaKeyTyped(evt);
-           }
-        });
-        
-        tabla.addMouseListener(new MouseAdapter() {
-           public void mouseClicked(MouseEvent evt) {
-              tablaMouseClicked(evt);
-           }
-    	});
         panelTabla.setLayout(null);
         
-    	// Agregar la tabla al frame (no necesita JScrollPane como Jtable)
         panelTabla.add(tabla);           
         tabla.setEditable(false);
         
-        JButton btnModPlan = new JButton("Modificar plan");
-        btnModPlan.addActionListener(new ActionListener() {
+        JButton btnModCarrera = new JButton("Modificar carrera");
+        btnModCarrera.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		new VentanaBuscarPlan();
+        		new VentanaBuscarCarrera();
         	}
         });
-        btnModPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-        btnModPlan.setBounds(505, 85, 167, 40);
-        add(btnModPlan);
+        btnModCarrera.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+        btnModCarrera.setBounds(505, 85, 167, 40);
+        add(btnModCarrera);
         
-        JButton btnBajaPlan = new JButton("Dar de baja plan");
-        btnBajaPlan.addActionListener(new ActionListener() {
+        JButton btnBajaCarrera = new JButton("Dar de baja carrera");
+        btnBajaCarrera.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		new VentanaElimPlan();
+        		new VentanaElimCarrera();
         	}
         });
-        btnBajaPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-        btnBajaPlan.setBounds(682, 85, 167, 40);
-        add(btnBajaPlan);
+        btnBajaCarrera.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+        btnBajaCarrera.setBounds(682, 85, 167, 40);
+        add(btnBajaCarrera);
         
         JButton btnAtras = new JButton("Atr\u00E1s");
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		setVisible(false);
-        		VistaAdmin.obtenerVistaAdmin().setVisible(true);
+        		VistaAdmin.vista().setVisible(true);
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
         btnAtras.setBounds(10, 11, 70, 23);
         add(btnAtras);
-                
-        actualizarListaPlanes();
+              
+        actualizarListaCarreras();
 	}
 	
 	
-	private void tablaMouseClicked(MouseEvent evt) 
-	{
-		if ((this.tabla.getSelectedRow() != -1) && (evt.getClickCount() == 2)) 
-		{
-			this.seleccionarFila();
-		}
-	}
-	
-	
-	private void tablaKeyTyped(KeyEvent evt) {
-		if ((this.tabla.getSelectedRow() != -1) && (evt.getKeyChar() == ' ')) 
-		{
-	         this.seleccionarFila();
-	    }
-	}
-	
-	
-	private void seleccionarFila()
-	{
-		this.seleccionado = this.tabla.getSelectedRow();
-	    this.txtNombre.setText(this.tabla.getValueAt(this.tabla.getSelectedRow(), 0).toString());
-	}
-	
-	
-	private void actualizarListaPlanes () {
+	private void actualizarListaCarreras () {
 		ConectorBD.obtenerConectorBD().conectarBD(tabla);
 		try
 	    {
-			String consultaPlanes = "SELECT * FROM planes ";
-			tabla.setSelectSql(consultaPlanes.trim());
+			String consultaCarreras = "SELECT * FROM carreras ";
+			tabla.setSelectSql(consultaCarreras.trim());
 			// Obtengo el modelo de la DB Table para actualizar el contenido de la lista de alumnos
 	    	tabla.createColumnModelFromQuery();
 	    	// actualizamos el contenido de la tabla.   	     	  
@@ -154,14 +113,14 @@ public class VistaPlanes extends JPanel {
 	    }
 		
 		catch (SQLException ex)
-	    {
+		{
 	         // en caso de error, se muestra la causa en la consola
 	         System.out.println("SQLException: " + ex.getMessage());
 	         System.out.println("SQLState: " + ex.getSQLState());
 	         System.out.println("VendorError: " + ex.getErrorCode());
 	         JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
 	        		 					   ex.getMessage() + "\n",
-	        		 					   "ERROR! No se pudo cargar la lista de planes",
+	        		 					   "ERROR! No se pudo cargar la lista de carreras",
 	                                       JOptionPane.ERROR_MESSAGE);
 	    }
 		ConectorBD.obtenerConectorBD().desconectarBD(tabla);
@@ -171,25 +130,25 @@ public class VistaPlanes extends JPanel {
 	
 	// CLASE PARA LA VENTANA DE INPUTS PARA EL REGISTRO
 	
-	public class VentanaRegPlan extends JFrame {
+	public class VentanaRegCarrera extends JFrame {
 		
 		private static final long serialVersionUID = 1L;	
 		private JTextField inputNombre;
-		private JTextField inputVersion;
+		private JTextField inputDuracion;
 		private JLabel lblNombre;
-		private JLabel lblVersion;
+		private JLabel lblDuracion;
 		private JButton btnSiguiente;
 		
 		
-		public VentanaRegPlan() {
+		public VentanaRegCarrera() {
 			super();
 			getContentPane().setLayout(null);
 	        setVisible(true);
 	        
 	        getContentPane().setBackground(SystemColor.controlHighlight);
-			setTitle("Registro de nueva materia");
-			setMaximumSize(new Dimension(395, 245));
-			setMinimumSize(new Dimension(395, 245));
+			setTitle("Registro de nueva carrera");
+			setMaximumSize(new Dimension(322, 245));
+			setMinimumSize(new Dimension(322, 245));
 			setResizable(false);		
 			setLocationRelativeTo(null);
 				
@@ -197,54 +156,54 @@ public class VistaPlanes extends JPanel {
 			
 			inputNombre = new JTextField();
 			inputNombre.setColumns(10);
-			inputNombre.setBounds(159, 55, 178, 20);
+			inputNombre.setBounds(94, 55, 171, 20);
 			getContentPane().add(inputNombre);
 			
-			inputVersion = new JTextField();
-			inputVersion.setBounds(159, 89, 48, 20);
-			getContentPane().add(inputVersion);
+			inputDuracion = new JTextField();
+			inputDuracion.setBounds(94, 88, 23, 20);
+			getContentPane().add(inputDuracion);
 			
-			lblNombre = new JLabel("Carrera asociada:");
+			lblNombre = new JLabel("Nombre:");
 			lblNombre.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 12));
-			lblNombre.setBounds(51, 54, 98, 20);
+			lblNombre.setBounds(25, 55, 59, 20);
 			getContentPane().add(lblNombre);
 			
-			lblVersion = new JLabel("Version:");
-			lblVersion.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 12));
-			lblVersion.setBounds(67, 88, 82, 20);
-			getContentPane().add(lblVersion);
+			lblDuracion = new JLabel("Duraci\u00F3n:");
+			lblDuracion.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 12));
+			lblDuracion.setBounds(25, 88, 59, 20);
+			getContentPane().add(lblDuracion);
 			
 			btnSiguiente = new JButton("Guardar");
 			btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 			btnSiguiente.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					registrarPlan();
+					registrarCarrera();
 					dispose();
 				}
 			});
-			btnSiguiente.setBounds(132, 153, 124, 23);
+			btnSiguiente.setBounds(94, 153, 124, 23);
 			getContentPane().add(btnSiguiente);
 			
 		}
 		
-		
-		private void registrarPlan ()
-		{
-			ConectorBD.obtenerConectorBD().conectarBD();
-			try
-		      {
+		   
+		private void registrarCarrera ()
+		   {
+			   ConectorBD.obtenerConectorBD().conectarBD();
+			   try
+			   {
 		         // Creo un comando JDBC para realizar la inserción en la BD
 		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
 		         	         
 		         // Genero la sentencia de inserción	         
-		         String sql = "INSERT INTO planes (nombre_carrera, version) VALUES (" + 
+		         String sql = "INSERT INTO carreras (nombre, duracion) VALUES (" + 
 		        		 	  "\'" + inputNombre.getText() +
-		        		 	  "\'," + inputVersion.getText() + ");";
+		        		 	  "\'," + inputDuracion.getText() + ");";
 
 		         // Ejecuto la inserción del nuevo alumno
 		         stmt.executeUpdate(sql);
 		         // Notifico éxito en la operación
-		         JOptionPane.showMessageDialog(this,"Plan registrado exitosamente");	         
+		         JOptionPane.showMessageDialog(this,"Carrera registrada exitosamente");	         
 		         stmt.close();
 		         dispose();
 		         
@@ -256,46 +215,44 @@ public class VistaPlanes extends JPanel {
 		         System.out.println("SQLState: " + ex.getSQLState());
 		         System.out.println("VendorError: " + ex.getErrorCode());
 		      }
-			ConectorBD.obtenerConectorBD().desconectarBD();
-		}
-		
+			  ConectorBD.obtenerConectorBD().desconectarBD();
+		      actualizarListaCarreras();
+		   }
 	}
 	
 	
-	private class VentanaBuscarPlan extends JFrame {
+	private class VentanaBuscarCarrera extends JFrame {
 		
 		private static final long serialVersionUID = 1L;
-		private JTextField inputNombre;
-		private JTextField inputVersion;
+		private JTextField inputId;
 		private JButton btnSiguiente;
-		;
 		
 		
-		// CONSTRUCTOR: Ventana para el registro de un nuevo plan
+		// CONSTRUCTOR: Ventana para el registro de una nueva carrera
 		
-		public VentanaBuscarPlan() {
+		public VentanaBuscarCarrera() {
 			super();
 			getContentPane().setLayout(null);
 	        setVisible(true);
 	        
 	        getContentPane().setBackground(SystemColor.controlHighlight);
-			setTitle("Modificación de un plan");
-			setSize(new Dimension(400, 177));
+			setTitle("Modificación de una carrera");
+			setSize(new Dimension(353, 170));
 			setResizable(false);		
 			setLocationRelativeTo(null);
 				
-			// CREACIÓN DE INPUTS
+			// CREACIÓN DE INPUTS: registro de alumno
 			
-			inputNombre = new JTextField();
-			inputNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			inputNombre.setBounds(159, 29, 188, 20);
-			getContentPane().add(inputNombre);
+			inputId = new JTextField();
+			inputId.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputId.setBounds(128, 41, 100, 20);
+			getContentPane().add(inputId);
 			
-			// CREACIÓN DE LABELS
+			// CREACIÓN DE LABELS: registro de alumno
 			
-			JLabel lblLU = new JLabel("Nombre de carrera:");		
+			JLabel lblLU = new JLabel("ID:");		
 			lblLU.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			lblLU.setBounds(41, 29, 108, 20);
+			lblLU.setBounds(89, 41, 29, 20);
 			getContentPane().add(lblLU);
 			
 			btnSiguiente = new JButton("A modificar");
@@ -306,22 +263,12 @@ public class VistaPlanes extends JPanel {
 					dispose();
 				}
 			});
-			btnSiguiente.setBounds(133, 104, 124, 23);
+			btnSiguiente.setBounds(115, 95, 124, 23);
 			getContentPane().add(btnSiguiente);
 			
-			inputVersion = new JTextField();
-			inputVersion.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			inputVersion.setBounds(159, 60, 75, 20);
-			getContentPane().add(inputVersion);
-			
-			JLabel lblVersion = new JLabel("Versi\u00F3n:");
-			lblVersion.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			lblVersion.setBounds(104, 60, 45, 20);
-			getContentPane().add(lblVersion);
-			
 		}
-		
-		
+			   
+		   
 		   private void abrirEdicionCarrera ()
 		   {
 			  ConectorBD.obtenerConectorBD().conectarBD();
@@ -330,18 +277,17 @@ public class VistaPlanes extends JPanel {
 		         // Creo un comando JDBC para realizar la inserción en la BD
 		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
 		         // Genero la sentencia de inserción	         
-		         String sql = "SELECT * FROM planes WHERE (nombre_carrera = " + inputNombre.getText() + ")";
+		         String sql = "SELECT * FROM carreras WHERE (id = " + inputId.getText() + ")";
 
 		         // Ejecuto la eliminación del alumno
 		         ResultSet rs = stmt.executeQuery(sql);
 		         if (!rs.next()) {
 		        	 JOptionPane.showMessageDialog(this,
-		        			 "ERROR! No existe el plan \'" + inputVersion.getText() + "\'" + 
-		        			 " para la carrera: " + inputNombre.getText(),
-		        			 "Modificación de un plan", JOptionPane.ERROR_MESSAGE);
+		        			 "ERROR! No existe una carrera registrada con ID: " + inputId.getText(),
+		        			 "Modificación de una carrera", JOptionPane.ERROR_MESSAGE);
 		         }
 		         else {
-		        	 new VentanaEdicionPlan(inputNombre.getText());			        	 
+		        	 new VentanaEdicionCarrera(Integer.parseInt(inputId.getText()));			        	 
 		         }
 		         stmt.close();
 		         dispose();	         
@@ -355,11 +301,11 @@ public class VistaPlanes extends JPanel {
 		      }
 		      
 		      ConectorBD.obtenerConectorBD().desconectarBD();
-		      actualizarListaPlanes();
+		      actualizarListaCarreras();
 		   }
 		   
 		   
-		   private class VentanaEdicionPlan extends JFrame {
+		   private class VentanaEdicionCarrera extends JFrame {
 			   
 				private static final long serialVersionUID = 1L;
 				private JTextField [] inputs;
@@ -369,7 +315,7 @@ public class VistaPlanes extends JPanel {
 				
 				// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
 				
-				public VentanaEdicionPlan(String nombreCarrera) {
+				public VentanaEdicionCarrera(int id) {
 					super();
 					getContentPane().setEnabled(false);
 					getContentPane().setLayout(null);
@@ -443,7 +389,7 @@ public class VistaPlanes extends JPanel {
 					btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 					btnSiguiente.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {				
-							modificarPlan(nombreCarrera);
+							modificarCarrera(id);
 							dispose();
 						}
 					});
@@ -460,7 +406,7 @@ public class VistaPlanes extends JPanel {
 				}
 				   
 				   
-				   private void modificarPlan (String nombreCarrera)
+				   private void modificarCarrera (int id)
 				   {
 					  ConectorBD.obtenerConectorBD().conectarBD();
 				      try
@@ -469,10 +415,10 @@ public class VistaPlanes extends JPanel {
 				    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
 				    	  int cantInputs = inputsHabilitados();
 				    	  // Genero la sentencia de inserción
-				    	  String sql = "UPDATE planes SET ";
+				    	  String sql = "UPDATE carreras SET ";
 				    	  // Si quiero modificar el DNI...
 				    	  if (inputs[0].isEnabled()) {
-				    		  sql += "nombre_carrera = \'" + inputs[0].getText() + "\'";
+				    		  sql += "nombre = \'" + inputs[0].getText() + "\'";
 				    		  cantInputs--;
 				    		  if (cantInputs > 0) {
 				    			  sql += ", ";
@@ -480,15 +426,15 @@ public class VistaPlanes extends JPanel {
 				    	  }
 				    	// Si quiero modificar el Nombre...
 				    	  if (inputs[1].isEnabled()) {
-				    		  sql += "version = " + inputs[1].getText() + " ";
+				    		  sql += "duracion = " + inputs[1].getText() + " ";
 				    		  cantInputs--;
 				    	  }
 				    	  
-				    	  sql += " WHERE (nombre = " + nombreCarrera + ");";
+				    	  sql += " WHERE (id = " + id + ");";
 
 				         // Ejecuto la inserción del nuevo alumno
 				         stmt.executeUpdate(sql);
-				         JOptionPane.showMessageDialog(this,"Carrera con ID: " + nombreCarrera +" modificada exitosamente");
+				         JOptionPane.showMessageDialog(this,"Carrera con ID: " + id +" modificada exitosamente");
 				         stmt.close();
 				         dispose();	         
 				      }
@@ -501,7 +447,7 @@ public class VistaPlanes extends JPanel {
 				      }
 				      
 				      ConectorBD.obtenerConectorBD().desconectarBD();
-				      actualizarListaPlanes();
+				      actualizarListaCarreras();
 				   }
 				   
 
@@ -515,100 +461,88 @@ public class VistaPlanes extends JPanel {
 					   }
 					   return cant;		
 				   }
-			}
+			}		   
 	}
 	
 	
 	
 	// CLASE PARA LA VENTANA DE INPUTS PARA LA BAJA
 	
-		public class VentanaElimPlan extends JFrame {
+	public class VentanaElimCarrera extends JFrame {
+		
+		private static final long serialVersionUID = 1L;
+		private JTextField inputNombre;
+		private JButton btnSiguiente;
+		
+		
+		// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
+		
+		public VentanaElimCarrera() {
+			super();
+			getContentPane().setLayout(null);
+	        setVisible(true);
+	        
+	        getContentPane().setBackground(SystemColor.controlHighlight);
+			setTitle("Baja de una materia");
+			setSize(new Dimension(380, 170));
+			setResizable(false);		
+			setLocationRelativeTo(null);
+				
+			// CREACIÓN DE INPUTS: registro de alumno
 			
-			private static final long serialVersionUID = 1L;
-			private JTextField inputNombre;
-			private JTextField inputNum;
-			private JButton btnSiguiente;
+			inputNombre = new JTextField();
+			inputNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputNombre.setBounds(163, 41, 176, 20);
+			getContentPane().add(inputNombre);
 			
+			// CREACIÓN DE LABELS: registro de alumno
 			
-			// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
+			JLabel lblId = new JLabel("Nombre de la carrera:");		
+			lblId.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			lblId.setBounds(23, 41, 128, 20);
+			getContentPane().add(lblId);
 			
-			public VentanaElimPlan() {
-				super();
-				getContentPane().setLayout(null);
-		        setVisible(true);
-		        
-		        getContentPane().setBackground(SystemColor.controlHighlight);
-				setTitle("Baja de una materia");
-				setSize(new Dimension(374, 197));
-				setResizable(false);		
-				setLocationRelativeTo(null);
-					
-				// CREACIÓN DE INPUTS: registro de alumno
-				
-				inputNombre = new JTextField();
-				inputNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-				inputNombre.setBounds(163, 41, 176, 20);
-				getContentPane().add(inputNombre);
-				
-				// CREACIÓN DE LABELS: registro de alumno
-				
-				JLabel lblId = new JLabel("Nombre de la carrera:");		
-				lblId.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-				lblId.setBounds(23, 41, 128, 20);
-				getContentPane().add(lblId);
-				
-				inputNum = new JTextField();
-				inputNum.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-				inputNum.setBounds(163, 72, 63, 20);
-				getContentPane().add(inputNum);
-				
-				JLabel lblNum = new JLabel("Version:");
-				lblNum.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-				lblNum.setBounds(82, 72, 69, 20);
-				getContentPane().add(lblNum);
-				
-				btnSiguiente = new JButton("Dar de baja");
-				btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-				btnSiguiente.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {				
-						eliminarPlan();
-						dispose();
-					}
-				});
-				btnSiguiente.setBounds(124, 119, 124, 23);
-				getContentPane().add(btnSiguiente);
-				
-			}
+			btnSiguiente = new JButton("Dar de baja");
+			btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+			btnSiguiente.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {				
+					eliminarCarrera();
+					dispose();
+				}
+			});
+			btnSiguiente.setBounds(123, 86, 124, 23);
+			getContentPane().add(btnSiguiente);
 			
-			
-			// CONEXIÓN Y DESCONEXIÓN DE LA BASE DE DATOS	   
-			   
-			   private void eliminarPlan ()
-			   {
-				  ConectorBD.obtenerConectorBD().conectarBD();
-			      try
-			      {
-			    	  // Creo un comando JDBC para realizar la inserción en la BD
-			    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-			    	  // Genero la sentencia de inserción
-			    	  String sql = "DELETE FROM planes WHERE (nombre_carrera = \'" + inputNombre.getText() +
-			    			  	   "\' and version = " + inputNum.getText() + ")";
-			    	  // Ejecuto la eliminación del alumno
-			    	  stmt.executeUpdate(sql);
-			    	  JOptionPane.showMessageDialog(this,"Plan dado de baja exitosamente");
-			    	  stmt.close();
-			    	  dispose();		         
-			      }
-			      catch (SQLException ex)
-			      {
-			         // en caso de error, se muestra la causa en la consola
-			         System.out.println("SQLException: " + ex.getMessage());
-			         System.out.println("SQLState: " + ex.getSQLState());
-			         System.out.println("VendorError: " + ex.getErrorCode());
-			      }		      
-			      ConectorBD.obtenerConectorBD().desconectarBD();
-			      actualizarListaPlanes();
-			   }
 		}
+		
+		
+		// CONEXIÓN Y DESCONEXIÓN DE LA BASE DE DATOS	   
+		   
+		   private void eliminarCarrera ()
+		   {
+			  ConectorBD.obtenerConectorBD().conectarBD();
+		      try
+		      {
+		    	  // Creo un comando JDBC para realizar la inserción en la BD
+		    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
+		    	  // Genero la sentencia de inserción
+		    	  String sql = "DELETE FROM carreras WHERE (nombre = \'" + inputNombre.getText() + "\')";
+		    	  // Ejecuto la eliminación del alumno
+		    	  stmt.executeUpdate(sql);
+		    	  JOptionPane.showMessageDialog(this,"Carrera dada de baja exitosamente");
+		    	  stmt.close();
+		    	  dispose();		         
+		      }
+		      catch (SQLException ex)
+		      {
+		         // en caso de error, se muestra la causa en la consola
+		         System.out.println("SQLException: " + ex.getMessage());
+		         System.out.println("SQLState: " + ex.getSQLState());
+		         System.out.println("VendorError: " + ex.getErrorCode());
+		      }		      
+		      ConectorBD.obtenerConectorBD().desconectarBD();
+		      actualizarListaCarreras();
+		   }
+	}
 
 }

@@ -9,7 +9,7 @@ public class VistaProfesor extends VistaHome {
 	private static VistaProfesor instancia = null;
 	
 	
-	public static VistaProfesor obtenerVistaProfesor () {
+	public static VistaProfesor vista () {
 		if (instancia == null) {
 			instancia = new VistaProfesor();
 		}

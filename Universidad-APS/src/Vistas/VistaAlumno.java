@@ -9,7 +9,7 @@ public class VistaAlumno extends VistaHome {
 	private static VistaAlumno instancia = null;
 	
 	
-	public static VistaAlumno obtenerVistaAlumno () {
+	public static VistaAlumno vista () {
 		if (instancia == null) {
 			instancia = new VistaAlumno();
 		}
