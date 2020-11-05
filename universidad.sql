@@ -25,10 +25,10 @@ DROP TABLE IF EXISTS `universidad`.`profesores` ;
 
 CREATE TABLE IF NOT EXISTS `universidad`.`profesores` (
   `matricula` INT UNSIGNED NOT NULL,
-  `dni` INT UNSIGNED NOT NULL,
+  `dni` INT UNSIGNED NOT NULL,  
+  `cuil` INT UNSIGNED NOT NULL,
   `nombre` VARCHAR(45) NULL,
   `apellido` VARCHAR(45) NULL,
-  `cuil` INT UNSIGNED NOT NULL,
   `genero` VARCHAR(45) NULL,
   PRIMARY KEY (`matricula`),
   UNIQUE INDEX `matricula_UNIQUE` (`matricula` ASC) VISIBLE,
@@ -98,21 +98,45 @@ ENGINE = InnoDB;
 -- -----------------------------------------------------
 -- Table `universidad`.`inscripciones`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `universidad`.`inscripciones` ;
+DROP TABLE IF EXISTS `universidad`.`inscripciones_carreras` ;
 
-CREATE TABLE IF NOT EXISTS `universidad`.`inscripciones` (
+CREATE TABLE IF NOT EXISTS `universidad`.`inscripciones_carreras` (
+  `LU_alumno` INT UNSIGNED NOT NULL,  
+  `id_plan` INT UNSIGNED NOT NULL, 
   `fecha` DATE NOT NULL,
-  `nombre_carrera` VARCHAR(45) NOT NULL,
-  `LU_alumnos` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`nombre_carrera`, `LU_alumnos`, `fecha`),
-  INDEX `LU_alumno_idx` (`LU_alumnos` ASC) VISIBLE,
+  PRIMARY KEY (`LU_alumno`, `id_plan`, `fecha`),
+  INDEX `LU_alumno_idx` (`LU_alumno` ASC) VISIBLE,
   CONSTRAINT `fk_carrera_inscripciones`
-    FOREIGN KEY (`nombre_carrera`)
-    REFERENCES `universidad`.`carreras` (`nombre`)
+    FOREIGN KEY (`id_plan`)
+    REFERENCES `universidad`.`planes` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_lu_inscripciones`
-    FOREIGN KEY (`LU_alumnos`)
+  CONSTRAINT `fk_LU_inscripto_carrera`
+    FOREIGN KEY (`LU_alumno`)
+    REFERENCES `universidad`.`alumnos` (`LU`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `universidad`.`inscripciones`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`inscripciones_materias` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`inscripciones_materias` (
+  `LU_alumno` INT UNSIGNED NOT NULL,  
+  `id_materia` INT UNSIGNED NOT NULL, 
+  `fecha` DATE NOT NULL,
+  PRIMARY KEY (`LU_alumno`, `id_materia`, `fecha`),
+  INDEX `LU_alumno_idx` (`LU_alumno` ASC) VISIBLE,
+  CONSTRAINT `fk_materia_inscripciones`
+    FOREIGN KEY (`id_materia`)
+    REFERENCES `universidad`.`materias` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_LU_inscripto_materia`
+    FOREIGN KEY (`LU_alumno`)
     REFERENCES `universidad`.`alumnos` (`LU`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
@@ -126,12 +150,12 @@ DROP TABLE IF EXISTS `universidad`.`planes` ;
 
 CREATE TABLE IF NOT EXISTS `universidad`.`planes` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre_carrera` VARCHAR(45) NOT NULL,
+  `id_carrera` INT UNSIGNED NOT NULL,
   `version` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_carrera_asociada`
-    FOREIGN KEY (`nombre_carrera`)
-    REFERENCES `universidad`.`carreras` (`nombre`)
+    FOREIGN KEY (`id_carrera`)
+    REFERENCES `universidad`.`carreras` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 	
@@ -159,8 +183,9 @@ DROP TABLE IF EXISTS `universidad`.`correlativas` ;
 
 CREATE TABLE IF NOT EXISTS `universidad`.`correlativas` (
   `id_materia` INT UNSIGNED NOT NULL,
-  `id_correlativa` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`id_materia`, `id_correlativa`),
+  `id_plan` INT UNSIGNED NOT NULL,
+  `id_correlativa` INT UNSIGNED,
+  PRIMARY KEY (`id_materia`, `id_correlativa`, `id_plan`),
   CONSTRAINT `fk_materia_correlativa`
     FOREIGN KEY (`id_materia`)  REFERENCES `universidad`.`materias` (`id` )
     ON DELETE NO ACTION
@@ -168,8 +193,12 @@ CREATE TABLE IF NOT EXISTS `universidad`.`correlativas` (
    CONSTRAINT `fk_correlativa`
     FOREIGN KEY (`id_correlativa`)  REFERENCES `universidad`.`materias` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION
- )
+    ON UPDATE NO ACTION,
+	CONSTRAINT `fk_plan_asociado`
+    FOREIGN KEY (`id_plan`)  REFERENCES `universidad`.`planes` (`id` )
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+	
 ENGINE = InnoDB;
 
 
