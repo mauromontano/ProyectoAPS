@@ -23,8 +23,6 @@ public abstract class VistaHome extends JPanel {
 	protected static final long serialVersionUID = 1L;
 	protected JLabel lblIdentidad;
 	protected JPanel panelBienvenida;
-	protected JTabbedPane tabbedPane;
-	protected JPanel panelDatos;
 	
 
 	/**
@@ -42,7 +40,7 @@ public abstract class VistaHome extends JPanel {
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-        btnAtras.setBounds(22, 73, 70, 23);
+        btnAtras.setBounds(29, 73, 70, 23);
         add(btnAtras);
 		
 		lblIdentidad = new JLabel("");
@@ -57,17 +55,6 @@ public abstract class VistaHome extends JPanel {
 		panelBienvenida.setBorder(new LineBorder(SystemColor.controlHighlight));
 		panelBienvenida.setBounds(22, 11, 1151, 37);
 		this.add(panelBienvenida);
-		
-		tabbedPane = new JTabbedPane(JTabbedPane.TOP);
-		tabbedPane.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-		tabbedPane.setBackground(SystemColor.menu);
-		tabbedPane.setBorder(new LineBorder(new Color(227, 227, 227), 0));
-		tabbedPane.setBounds(22, 125, 1151, 506);
-		this.add(tabbedPane);
-		
-		panelDatos = new JPanel();
-		panelDatos.setBackground(SystemColor.control);
-		tabbedPane.addTab("Datos personales", null, panelDatos, null);
 		setMinimumSize(new Dimension(1200, 728));
 	}
 	

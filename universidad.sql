@@ -90,7 +90,7 @@ CREATE TABLE IF NOT EXISTS `universidad`.`carreras` (
   `nombre` VARCHAR(45) NOT NULL,
   `duracion` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`nombre`),
-  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE),
+  UNIQUE INDEX `id_UNIQUE` (`id` ASC) VISIBLE,
   UNIQUE INDEX `nombre_UNIQUE` (`nombre` ASC) VISIBLE)
 ENGINE = InnoDB;
 
@@ -125,14 +125,16 @@ ENGINE = InnoDB;
 DROP TABLE IF EXISTS `universidad`.`planes` ;
 
 CREATE TABLE IF NOT EXISTS `universidad`.`planes` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `nombre_carrera` VARCHAR(45) NOT NULL,
   `version` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`nombre_carrera`, `version`),
-  CONSTRAINT `fk_planes`
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_carrera_asociada`
     FOREIGN KEY (`nombre_carrera`)
     REFERENCES `universidad`.`carreras` (`nombre`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
+	
 ENGINE = InnoDB;
 
 
@@ -159,7 +161,7 @@ CREATE TABLE IF NOT EXISTS `universidad`.`correlativas` (
   `id_materia` INT UNSIGNED NOT NULL,
   `id_correlativa` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id_materia`, `id_correlativa`),
-  CONSTRAINT `fk_materia`
+  CONSTRAINT `fk_materia_correlativa`
     FOREIGN KEY (`id_materia`)  REFERENCES `universidad`.`materias` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
@@ -221,6 +223,29 @@ CREATE TABLE IF NOT EXISTS `universidad`.`dictan` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+
+-- -----------------------------------------------------
+-- Table `universidad`.`planes_materias``
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`planes_materias` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`planes_materias` (
+  `id_plan` INT UNSIGNED NOT NULL,
+  `id_materia` INT UNSIGNED NOT NULL,  
+  
+  PRIMARY KEY (`id_plan`, `id_materia`),
+  CONSTRAINT `fk_plan`
+    FOREIGN KEY (`id_plan`)
+    REFERENCES `universidad`.`planes` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_materia`
+    FOREIGN KEY (`id_materia`)
+    REFERENCES `universidad`.`materias` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+	
+ENGINE = InnoDB;
 
 SET SQL_MODE = ``;
 DROP USER IF EXISTS admin_uni;

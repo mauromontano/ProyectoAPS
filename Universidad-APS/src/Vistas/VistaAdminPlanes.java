@@ -61,7 +61,7 @@ public class VistaAdminPlanes extends JPanel {
 				new VentanaRegPlan();
 			}
 		});
-		btnRegPlan.setBounds(328, 84, 167, 40);
+		btnRegPlan.setBounds(323, 39, 167, 40);
 		this.add(btnRegPlan);
 		
 		tabla = new DBTable();
@@ -91,7 +91,7 @@ public class VistaAdminPlanes extends JPanel {
         	}
         });
         btnModPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-        btnModPlan.setBounds(505, 85, 167, 40);
+        btnModPlan.setBounds(323, 90, 167, 40);
         add(btnModPlan);
         
         JButton btnBajaPlan = new JButton("Dar de baja plan");
@@ -101,7 +101,7 @@ public class VistaAdminPlanes extends JPanel {
         	}
         });
         btnBajaPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-        btnBajaPlan.setBounds(682, 85, 167, 40);
+        btnBajaPlan.setBounds(323, 141, 167, 40);
         add(btnBajaPlan);
         
         JButton btnAtras = new JButton("Atr\u00E1s");
@@ -116,21 +116,23 @@ public class VistaAdminPlanes extends JPanel {
         add(btnAtras);
         
         JButton btnAgregarMatPlan = new JButton("Agregar materia a plan");
+        btnAgregarMatPlan.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 13));
         btnAgregarMatPlan.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		new VentanaAgregarMat();
         	}
         });
-        btnAgregarMatPlan.setBounds(419, 148, 143, 40);
+        btnAgregarMatPlan.setBounds(696, 39, 171, 40);
         add(btnAgregarMatPlan);
         
         JButton btnRegCorrelativa = new JButton("Registrar correlativa");
+        btnRegCorrelativa.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
         btnRegCorrelativa.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		new VentanaAgregarCor();
         	}
         });
-        btnRegCorrelativa.setBounds(612, 148, 143, 40);
+        btnRegCorrelativa.setBounds(696, 90, 171, 40);
         add(btnRegCorrelativa);
                 
         actualizarListaPlanes();

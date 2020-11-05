@@ -4,6 +4,7 @@ import Modelos.Alumno;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Font;
 
 public class VistaAlumno extends VistaHome {
 	
@@ -26,21 +27,23 @@ public class VistaAlumno extends VistaHome {
 		this.setBounds(0,0,1200,728);
 		
 		JButton btnInsCarrera = new JButton("Inscribirse a carrera");
+		btnInsCarrera.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 		btnInsCarrera.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new VentanaInsripcionCarrera(modeloAlumno.obtenerLU());
 			}
 		});
-		btnInsCarrera.setBounds(341, 83, 160, 31);
+		btnInsCarrera.setBounds(401, 125, 160, 31);
 		add(btnInsCarrera);
 		
 		JButton btnInsMateria = new JButton("Inscribirse a materia");
+		btnInsMateria.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 		btnInsMateria.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				new VentanaInscripcionMateria(modeloAlumno.obtenerLU());
 			}
 		});
-		btnInsMateria.setBounds(586, 83, 160, 31);
+		btnInsMateria.setBounds(624, 125, 160, 31);
 		add(btnInsMateria);
 	}
 	
