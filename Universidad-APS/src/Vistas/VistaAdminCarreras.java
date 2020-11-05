@@ -1,4 +1,5 @@
 package Vistas;
+
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -17,8 +18,8 @@ import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import Conector.ConectorBD;
+import Controladores.ControladorVistas;
 import quick.dbtable.DBTable;
-
 
 public class VistaAdminCarreras extends JPanel {
 	
@@ -27,7 +28,10 @@ public class VistaAdminCarreras extends JPanel {
 	private DBTable tabla;
 	protected int seleccionado = -1;
 	
-	
+	/**
+	 * vista: retorna la instancia de la vista de administración de carreras
+	 * @return panel de la vista de administración de carreras
+	 */
 	public static VistaAdminCarreras vista () {
 		if (instancia == null) {
 			instancia = new VistaAdminCarreras();
@@ -35,7 +39,9 @@ public class VistaAdminCarreras extends JPanel {
 		return instancia;
 	}
 	
-	// CONSTRUCTOR: Vista de alumnos	
+	/**
+	 * CONSTRUCTOR: Vista para la administración de carreras
+	 */
 	private VistaAdminCarreras() {
 		
 		this.setBackground(SystemColor.control);
@@ -88,8 +94,8 @@ public class VistaAdminCarreras extends JPanel {
         JButton btnAtras = new JButton("Atr\u00E1s");
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		setVisible(false);
-        		VistaAdmin.vista().setVisible(true);
+        		// Vuelvo a la vista anterior, la vista de administración
+        		ControladorVistas.controlador().mostrar(VistaAdmin.vista());
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
@@ -99,7 +105,10 @@ public class VistaAdminCarreras extends JPanel {
         actualizarListaCarreras();
 	}
 	
-	
+	/**
+	 * actualizarListaCarreras: permite actualizar el contenido de la db table para carreras,
+	   con todas las carreras registradas y sus datos.
+	 */
 	private void actualizarListaCarreras () {
 		ConectorBD.obtenerConectorBD().conectarBD(tabla);
 		try
@@ -110,8 +119,7 @@ public class VistaAdminCarreras extends JPanel {
 	    	tabla.createColumnModelFromQuery();
 	    	// actualizamos el contenido de la tabla.   	     	  
 	    	tabla.refresh();
-	    }
-		
+	    }		
 		catch (SQLException ex)
 		{
 	         // en caso de error, se muestra la causa en la consola
@@ -127,7 +135,6 @@ public class VistaAdminCarreras extends JPanel {
 	}
 	
 	
-	
 	// CLASE PARA LA VENTANA DE INPUTS PARA EL REGISTRO
 	
 	public class VentanaRegCarrera extends JFrame {
@@ -139,7 +146,9 @@ public class VistaAdminCarreras extends JPanel {
 		private JLabel lblDuracion;
 		private JButton btnSiguiente;
 		
-		
+		/*
+		 * CONSTRUCTOR: ventana para el registro de una nueva carrera
+		 */
 		public VentanaRegCarrera() {
 			super();
 			getContentPane().setLayout(null);
@@ -186,7 +195,9 @@ public class VistaAdminCarreras extends JPanel {
 			
 		}
 		
-		   
+		/**
+		 * registrarCarrera: solicita el registro de una nueva carrera en el sistema
+		 */
 		private void registrarCarrera ()
 		   {
 			   ConectorBD.obtenerConectorBD().conectarBD();
@@ -219,6 +230,9 @@ public class VistaAdminCarreras extends JPanel {
 		      actualizarListaCarreras();
 		   }
 	}
+	
+	
+	// CLASE PARA LA BÚSQUEDA DE UNA CARRERA QUE SE DESEA MODIFICAR
 	
 	
 	private class VentanaBuscarCarrera extends JFrame {

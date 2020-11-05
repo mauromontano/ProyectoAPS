@@ -32,7 +32,7 @@ public class VistaInicio extends JPanel {
 	
 	
 	/**
-	 * obtenerVista: retorna la instancia asociada a la vista inicial
+	 * vista: retorna la instancia asociada a la vista inicial
 	 * @return panel de la vista inicial
 	 */
 	public static VistaInicio vista () {

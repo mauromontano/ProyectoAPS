@@ -32,8 +32,8 @@ public class VistaAdmin extends JPanel {
 		JButton btnAtras = new JButton("Atr\u00E1s");
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		setVisible(false);
-        		VistaInicio.vista().setVisible(true);
+        		// Vuelvo a la vista anterior, la vista de inicio
+        		ControladorVistas.controlador().mostrar(VistaInicio.vista());
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
@@ -61,7 +61,7 @@ public class VistaAdmin extends JPanel {
 		btnSecCarreras.setBounds(102, 85, 160, 31);
 		btnSecCarreras.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				// Swap a la vista de administración de materias
+				// Swap a la vista de administración de carreras
 				ControladorVistas.controlador().mostrar(VistaAdminCarreras.vista());
 			}
 		});

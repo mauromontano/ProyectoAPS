@@ -43,7 +43,6 @@ public class Alumno {
 			nom = rs.getString(3);
 			ap = rs.getString(4);
 			gen = rs.getString(5);
-			rs.next();
 			return new Alumno(lu, d, nom, ap, gen);
 		}
 		catch (NumberFormatException | SQLException ex) 
@@ -91,6 +90,6 @@ public class Alumno {
 	 */
 	public String obtenerGenero () {
 		return new String(genero);
-	}	
+	}
 
 }

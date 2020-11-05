@@ -1,4 +1,5 @@
 package Vistas;
+
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
@@ -14,16 +15,18 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import Conector.ConectorBD;
+import Controladores.ControladorAlumno;
+import Controladores.ControladorVistas;
+import Excepciones.ExcepcionEliminacion;
+import Excepciones.ExcepcionRegistro;
+import Modelos.Alumno;
 import quick.dbtable.DBTable;
-
 
 public class VistaAdminAlumnos extends JPanel {
 	
@@ -33,7 +36,10 @@ public class VistaAdminAlumnos extends JPanel {
 	private JTextField txtNombre;
 	protected int seleccionado = -1;
 	
-	
+	/**
+	 * vista: retorna la instancia de la vista de administración de alumnos
+	 * @return panel de la vista de administración de alumnos
+	 */
 	public static VistaAdminAlumnos vista () {
 		if (instancia == null) {
 			instancia = new VistaAdminAlumnos();
@@ -41,7 +47,9 @@ public class VistaAdminAlumnos extends JPanel {
 		return instancia;
 	}
 	
-	// CONSTRUCTOR: Vista de alumnos	
+	/**
+	 * CONSTRUCTOR: Vista para la administración de alumnos
+	 */ 	
 	private VistaAdminAlumnos() {
 		
 		this.setBackground(SystemColor.control);
@@ -106,8 +114,8 @@ public class VistaAdminAlumnos extends JPanel {
         JButton btnAtras = new JButton("Atr\u00E1s");
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		setVisible(false);
-        		VistaAdmin.vista().setVisible(true);
+        		// Vuelvo a la vista anterior, la vista de administración
+        		ControladorVistas.controlador().mostrar(VistaAdmin.vista());
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
@@ -141,8 +149,12 @@ public class VistaAdminAlumnos extends JPanel {
 	    this.txtNombre.setText(this.tabla.getValueAt(this.tabla.getSelectedRow(), 0).toString());
 	}
 	
-	
+	/**
+	 * actualizarListaAlumnos: permite actualizar el contenido de la db table para alumnos,
+	   con todos los alumnos registrados y sus datos.
+	 */
 	private void actualizarListaAlumnos () {
+		ControladorAlumno.controlador();
 		ConectorBD.obtenerConectorBD().conectarBD(tabla);
 		try
 	    {
@@ -152,8 +164,7 @@ public class VistaAdminAlumnos extends JPanel {
 	    	tabla.createColumnModelFromQuery();
 	    	// Actualizo el contenido de la tabla   	     	  
 	    	tabla.refresh();
-	    }
-		
+	    }		
 		catch (SQLException ex)
 		{
 	         // en caso de error, se muestra la causa en la consola
@@ -166,11 +177,11 @@ public class VistaAdminAlumnos extends JPanel {
 	                                       JOptionPane.ERROR_MESSAGE);
 	    }
 		ConectorBD.obtenerConectorBD().desconectarBD(tabla);
-	}
-	
+	}	
 	
 	
 	// CLASE PARA LA VENTANA DE INPUTS PARA EL REGISTRO
+	
 	
 	private class VentanaRegAlumno extends JFrame {
 		
@@ -326,8 +337,7 @@ public class VistaAdminAlumnos extends JPanel {
 			btnSiguiente = new JButton("Guardar");
 			btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 			btnSiguiente.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-					
+				public void actionPerformed(ActionEvent e) {					
 					registrarAlumno();
 					dispose();
 				}
@@ -338,45 +348,25 @@ public class VistaAdminAlumnos extends JPanel {
 		}
 		
 		
-		// CONEXIÓN Y DESCONEXIÓN DE LA BASE DE DATOS	   
-		   
-		   private void registrarAlumno ()
-		   {
-			  ConectorBD.obtenerConectorBD().conectarBD();
-		      try
-		      {
-		         // Creo un comando JDBC para realizar la inserción en la BD
-		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		         // Genero la sentencia de inserción	         
-		         String sql = "INSERT INTO alumnos (dni, nombre, apellido, genero) VALUES (" + 
-		        		 	  inputDNI.getText() + 
-		        		 	  ",\'" + inputNombre.getText() +
-		        		 	  "\',\'" + inputApellido.getText() + 
-		        		 	  "\',\'" + inputGenero.getSelectedItem() + "\');";
-
-		         // Ejecuto la inserción del nuevo alumno
-		         stmt.executeUpdate(sql);
-		         JOptionPane.showMessageDialog(this,"Alumno registrado exitosamente");
-		         stmt.close();
-		         dispose();	         
-		      }
-		      catch (SQLException ex)
-		      {
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
-		      }
-		      
-		      ConectorBD.obtenerConectorBD().desconectarBD();
-		      actualizarListaAlumnos();
-		   }
-		   
+		/**
+		 * registrarAlumno: solicita el registro de un nuevo alumno en el sistema
+		 */
+		private void registrarAlumno () {
+			String [] inputs = {
+					inputDNI.getText(), 
+					inputNombre.getText(),
+					inputApellido.getText(),
+					(String) inputGenero.getSelectedItem()
+					};			
+			ControladorAlumno.controlador().registrar(inputs);
+			JOptionPane.showMessageDialog(this,"Alumno registrado exitosamente");
+			actualizarListaAlumnos();
+			dispose();			
+		}
 	}
 	
 	
-	// CLASE PARA LA VENTANA DE BÚSQUEDA DE ALUMNO PARA SU MODIFICACIÓN
-	
+	// CLASE PARA LA VENTANA DE BÚSQUEDA DE ALUMNO PARA SU MODIFICACIÓN	
 	
 	private class VentanaBuscarAlumno extends JFrame {
 		
@@ -385,8 +375,7 @@ public class VistaAdminAlumnos extends JPanel {
 		private JButton btnSiguiente;
 		
 		
-		// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
-		
+		// CONSTRUCTOR: Ventana para el registro de un nuevo alumno		
 		public VentanaBuscarAlumno() {
 			super();
 			getContentPane().setLayout(null);
@@ -425,422 +414,380 @@ public class VistaAdminAlumnos extends JPanel {
 			
 		}
 		
+		/**
+		 * abrirEdicionAlumno: abre una nueva ventana que permita ingresar datos de entrada
+		   para la edición de datos de registro asociados a un alumno
+		 */
+		private void abrirEdicionAlumno () {
+			Alumno alumno;
+			int lu = Integer.parseInt(inputLU.getText());
+			ConectorBD.obtenerConectorBD().conectarBD();
+			
+			alumno = ControladorAlumno.controlador().obtenerAlumno(lu);
+			if (alumno == null) {
+				JOptionPane.showMessageDialog(this,
+						"ERROR! No existe un alumno registrado con LU: " + inputLU.getText(),
+						"Modificación de un alumno", JOptionPane.ERROR_MESSAGE);
+			}
+			else {
+				new VentanaEdicionAlumno(Integer.parseInt(inputLU.getText()));
+			}
+			ConectorBD.obtenerConectorBD().desconectarBD();
+			dispose();			
+		}
 		
-		// CONEXIÓN Y DESCONEXIÓN DE LA BASE DE DATOS	   
-		   
-		   private void abrirEdicionAlumno ()
-		   {
-			  ConectorBD.obtenerConectorBD().conectarBD();
-		      try
-		      {
-		         // Creo un comando JDBC para realizar la inserción en la BD
-		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		         // Genero la sentencia de inserción	         
-		         String sql = "SELECT * FROM alumnos WHERE (LU = " + inputLU.getText() + ")";
-
-		         // Ejecuto la eliminación del alumno
-		         ResultSet rs = stmt.executeQuery(sql);
-		         if (!rs.next()) {
-		        	 JOptionPane.showMessageDialog(this,
-		        			 "ERROR! No existe un alumno registrado con LU: " + inputLU.getText(),
-		        			 "Modificación de un alumno", JOptionPane.ERROR_MESSAGE);
-		         }
-		         else {
-		        	 new VentanaEdicionAlumno(Integer.parseInt(inputLU.getText()));			        	 
-		         }
-		         stmt.close();
-		         dispose();	         
-		      }
-		      catch (SQLException ex)
-		      {
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
-		      }
-		      
-		      ConectorBD.obtenerConectorBD().desconectarBD();
-		      actualizarListaAlumnos();
-		   }
-		   
-		   
-		   private class VentanaEdicionAlumno extends JFrame {
-				private static final long serialVersionUID = 1L;
-				private JTextField [] inputs;
-				private JCheckBox [] checkBoxes;
-				private JComboBox<String> switchGenero;
-				private JButton btnSiguiente;
+		
+		// CLASE ASOCIADA A LA VENTANA PARA INTRODUCIR DATOS PARA MODIFICAR UN ALUMNO
+		
+		private class VentanaEdicionAlumno extends JFrame {
+			
+			private static final long serialVersionUID = 1L;
+			private JTextField [] inputs;
+			private JCheckBox [] checkBoxes;
+			private JComboBox<String> switchGenero;
+			private JButton btnSiguiente;		
 				
+			/**
+			 * CONSTRUCTOR: Ventana para el registro de un nuevo alumno
+			 * @param lu: número de libreta universitaria asociado al alumno a modificar
+			 */
+			public VentanaEdicionAlumno (int lu) {
+				super();
+				getContentPane().setEnabled(false);
+				getContentPane().setLayout(null);
+				setVisible(true);
 				
-				// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
+				getContentPane().setBackground(SystemColor.controlHighlight);
+				setTitle("Modificación de un alumno");
+				setMaximumSize(new Dimension(322, 430));
+				setMinimumSize(new Dimension(322, 430));
+				setResizable(false);
+				setLocationRelativeTo(null);
 				
-				public VentanaEdicionAlumno(int lu) {
-					super();
-					getContentPane().setEnabled(false);
-					getContentPane().setLayout(null);
-			        setVisible(true);
-			        
-			        getContentPane().setBackground(SystemColor.controlHighlight);
-					setTitle("Modificación de un alumno");
-					setMaximumSize(new Dimension(322, 430));
-					setMinimumSize(new Dimension(322, 430));
-					setResizable(false);		
-					setLocationRelativeTo(null);
-						
-					// CREACIÓN DE INPUTS: modificación de alumno
-					inputs = new JTextField[9];
-					checkBoxes = new JCheckBox[10];
-					
-					// DNI
-					inputs[0] = new JTextField();
-					inputs[0].setEnabled(false);
-					inputs[0].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[0].setBounds(125, 24, 124, 20);
-					getContentPane().add(inputs[0]);
-					inputs[0].setColumns(10);
-					
-					// Nombre
-					inputs[1] = new JTextField();
-					inputs[1].setEnabled(false);
-					inputs[1].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[1].setColumns(10);
-					inputs[1].setBounds(124, 55, 125, 20);
-					getContentPane().add(inputs[1]);
-					
-					// Apellido
-					inputs[2] = new JTextField();
-					inputs[2].setEnabled(false);
-					inputs[2].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[2].setColumns(10);
-					inputs[2].setBounds(124, 88, 125, 20);
-					getContentPane().add(inputs[2]);
-					
-					// Genero
-					switchGenero = new JComboBox<String>();
-					switchGenero.setEnabled(false);
-					switchGenero.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					switchGenero.setBounds(125, 119, 124, 20);
-					switchGenero.addItem("Masculino");
-					switchGenero.addItem("Femenino");
-					getContentPane().add(switchGenero);
-					
-					// Mail
-					inputs[3] = new JTextField();
-					inputs[3].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[3].setEnabled(false);
-					inputs[3].setColumns(10);
-					inputs[3].setBounds(124, 153, 125, 20);
-					getContentPane().add(inputs[3]);
-					
-					// Telefono
-					inputs[4] = new JTextField();
-					inputs[4].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[4].setEnabled(false);
-					inputs[4].setColumns(10);
-					inputs[4].setBounds(124, 184, 125, 20);
-					getContentPane().add(inputs[4]);
-					
-					// Calle
-					inputs[5] = new JTextField();
-					inputs[5].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[5].setEnabled(false);
-					inputs[5].setColumns(10);
-					inputs[5].setBounds(124, 215, 125, 20);
-					getContentPane().add(inputs[5]);
-					
-					// Numero
-					inputs[6] = new JTextField();
-					inputs[6].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[6].setEnabled(false);
-					inputs[6].setColumns(10);
-					inputs[6].setBounds(124, 246, 125, 20);
-					getContentPane().add(inputs[6]);
-					
-					// Piso
-					inputs[7] = new JTextField();
-					inputs[7].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[7].setEnabled(false);
-					inputs[7].setColumns(10);
-					inputs[7].setBounds(124, 277, 125, 20);
-					getContentPane().add(inputs[7]);
-					
-					// Depto
-					inputs[8] = new JTextField();
-					inputs[8].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[8].setEnabled(false);
-					inputs[8].setColumns(10);
-					inputs[8].setBounds(125, 308, 124, 20);
-					getContentPane().add(inputs[8]);
-							
-					// CREACIÓN DE CHECKBOXES:
-					
-					// DNI
-					checkBoxes[0] = new JCheckBox("");
-					checkBoxes[0].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[0]);
-						}
-					});
-					checkBoxes[0].setBackground(SystemColor.controlHighlight);
-					checkBoxes[0].setBounds(255, 24, 26, 20);
-					getContentPane().add(checkBoxes[0]);
-					
-					// Nombre
-					checkBoxes[1] = new JCheckBox("");
-					checkBoxes[1].setBackground(SystemColor.controlHighlight);
-					checkBoxes[1].setBounds(255, 55, 26, 20);
-					checkBoxes[1].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[1]);
-						}
-					});
-					getContentPane().add(checkBoxes[1]);
-					
-					// Apellido
-					checkBoxes[2] = new JCheckBox("");
-					checkBoxes[2].setBackground(SystemColor.controlHighlight);
-					checkBoxes[2].setBounds(255, 88, 26, 20);
-					checkBoxes[2].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[2]);
-						}
-					});
-					getContentPane().add(checkBoxes[2]);
-					
-					// Genero
-					checkBoxes[9] = new JCheckBox("");
-					checkBoxes[9].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(switchGenero);
-						}
-					});
-					checkBoxes[9].setBackground(SystemColor.controlHighlight);
-					checkBoxes[9].setBounds(255, 119, 26, 20);
-					getContentPane().add(checkBoxes[9]);
-					
-					// Mail
-					checkBoxes[3] = new JCheckBox("");
-					checkBoxes[3].setEnabled(false);
-					checkBoxes[3].setBackground(SystemColor.controlHighlight);
-					checkBoxes[3].setBounds(255, 153, 26, 20);
-					checkBoxes[3].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[3]);
-						}
-					});
-					getContentPane().add(checkBoxes[3]);
-					
-					// Telefono
-					checkBoxes[4] = new JCheckBox("");
-					checkBoxes[4].setEnabled(false);
-					checkBoxes[4].setBackground(SystemColor.controlHighlight);
-					checkBoxes[4].setBounds(255, 184, 26, 20);
-					checkBoxes[4].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[4]);
-						}
-					});
-					getContentPane().add(checkBoxes[4]);
-					
-					// Calle
-					checkBoxes[5] = new JCheckBox("");
-					checkBoxes[5].setEnabled(false);
-					checkBoxes[5].setBackground(SystemColor.controlHighlight);
-					checkBoxes[5].setBounds(255, 215, 26, 20);
-					checkBoxes[5].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[5]);
-						}
-					});
-					getContentPane().add(checkBoxes[5]);
+				// CREACIÓN DE INPUTS: modificación de alumno
+				inputs = new JTextField[9];
+				checkBoxes = new JCheckBox[10];
+				// DNI
+				inputs[0] = new JTextField();
+				inputs[0].setEnabled(false);
+				inputs[0].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				inputs[0].setBounds(125, 24, 124, 20);
+				getContentPane().add(inputs[0]);
+				inputs[0].setColumns(10);
+				// Nombre
+				inputs[1] = new JTextField();
+				inputs[1].setEnabled(false);
+				inputs[1].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				inputs[1].setColumns(10);
+				inputs[1].setBounds(124, 55, 125, 20);
+				getContentPane().add(inputs[1]);
+				// Apellido
+				inputs[2] = new JTextField();
+				inputs[2].setEnabled(false);
+				inputs[2].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				inputs[2].setColumns(10);
+				inputs[2].setBounds(124, 88, 125, 20);
+				getContentPane().add(inputs[2]);
+				// Genero
+				switchGenero = new JComboBox<String>();
+				switchGenero.setEnabled(false);
+				switchGenero.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				switchGenero.setBounds(125, 119, 124, 20);
+				switchGenero.addItem("Masculino");
+				switchGenero.addItem("Femenino");
+				getContentPane().add(switchGenero);
+				// Mail
+				inputs[3] = new JTextField();
+				inputs[3].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				inputs[3].setEnabled(false);
+				inputs[3].setColumns(10);
+				inputs[3].setBounds(124, 153, 125, 20);
+				getContentPane().add(inputs[3]);
+				// Telefono
+				inputs[4] = new JTextField();
+				inputs[4].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				inputs[4].setEnabled(false);
+				inputs[4].setColumns(10);
+				inputs[4].setBounds(124, 184, 125, 20);
+				getContentPane().add(inputs[4]);
+				// Calle
+				inputs[5] = new JTextField();
+				inputs[5].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				inputs[5].setEnabled(false);
+				inputs[5].setColumns(10);
+				inputs[5].setBounds(124, 215, 125, 20);
+				getContentPane().add(inputs[5]);
+				// Numero
+				inputs[6] = new JTextField();
+				inputs[6].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				inputs[6].setEnabled(false);
+				inputs[6].setColumns(10);
+				inputs[6].setBounds(124, 246, 125, 20);
+				getContentPane().add(inputs[6]);
+				// Piso
+				inputs[7] = new JTextField();
+				inputs[7].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				inputs[7].setEnabled(false);
+				inputs[7].setColumns(10);
+				inputs[7].setBounds(124, 277, 125, 20);
+				getContentPane().add(inputs[7]);
+				// Depto
+				inputs[8] = new JTextField();
+				inputs[8].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				inputs[8].setEnabled(false);
+				inputs[8].setColumns(10);
+				inputs[8].setBounds(125, 308, 124, 20);
+				getContentPane().add(inputs[8]);
 				
-					// Numero
-					checkBoxes[6] = new JCheckBox("");
-					checkBoxes[6].setEnabled(false);
-					checkBoxes[6].setBackground(SystemColor.controlHighlight);
-					checkBoxes[6].setBounds(255, 246, 26, 20);
-					checkBoxes[6].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[6]);
-						}
-					});
-					getContentPane().add(checkBoxes[6]);
-					
-					// Piso
-					checkBoxes[7] = new JCheckBox("");
-					checkBoxes[7].setEnabled(false);
-					checkBoxes[7].setBackground(SystemColor.controlHighlight);
-					checkBoxes[7].setBounds(255, 277, 26, 20);
-					checkBoxes[7].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[7]);
-						}
-					});
-					getContentPane().add(checkBoxes[7]);
-					
-					// Depto
-					checkBoxes[8] = new JCheckBox("");
-					checkBoxes[8].setEnabled(false);
-					checkBoxes[8].setBackground(SystemColor.controlHighlight);
-					checkBoxes[8].setBounds(255, 308, 26, 20);
-					checkBoxes[8].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[8]);
-						}
-					});
-					getContentPane().add(checkBoxes[9]);
-					
-					// CREACIÓN DE LABELS: registro de alumno
-					
-					JLabel lblDNI = new JLabel("DNI:");		
-					lblDNI.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblDNI.setBounds(74, 24, 41, 20);
-					getContentPane().add(lblDNI);
-					
-					JLabel lblNombre = new JLabel("Nombre:");
-					lblNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblNombre.setBounds(56, 55, 59, 20);
-					getContentPane().add(lblNombre);
-					
-					JLabel lblApellido = new JLabel("Apellido:");
-					lblApellido.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblApellido.setBounds(56, 88, 59, 20);
-					getContentPane().add(lblApellido);
-					
-					JLabel lblGenero = new JLabel("G\u00E9nero:");
-					lblGenero.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblGenero.setBounds(58, 119, 57, 20);
-					getContentPane().add(lblGenero);
-					
-					JLabel lblMail = new JLabel("Mail:");
-					lblMail.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblMail.setBounds(74, 153, 41, 20);
-					getContentPane().add(lblMail);
-					
-					JLabel lblTelfono = new JLabel("Tel\u00E9fono:");
-					lblTelfono.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblTelfono.setBounds(44, 184, 71, 20);
-					getContentPane().add(lblTelfono);
-					
-					JLabel lblCalle = new JLabel("Calle:");
-					lblCalle.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblCalle.setBounds(72, 215, 41, 20);
-					getContentPane().add(lblCalle);
-					
-					JLabel lblNum = new JLabel("N\u00B0:");
-					lblNum.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblNum.setBounds(74, 246, 41, 20);
-					getContentPane().add(lblNum);
-					
-					JLabel lblPiso = new JLabel("Piso:");
-					lblPiso.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblPiso.setBounds(74, 277, 39, 20);
-					getContentPane().add(lblPiso);
-					
-					JLabel lblDepto = new JLabel("Depto:");
-					lblDepto.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblDepto.setBounds(56, 308, 59, 20);
-					getContentPane().add(lblDepto);
-					
-					btnSiguiente = new JButton("Guardar");
-					btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-					btnSiguiente.addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {				
-							modificarAlumno(lu);
-							dispose();
-						}
-					});
-					btnSiguiente.setBounds(107, 354, 124, 23);
-					getContentPane().add(btnSiguiente);	
-				}
+				// CREACIÓN DE CHECKBOXES:
 				
+				// DNI
+				checkBoxes[0] = new JCheckBox("");
+				checkBoxes[0].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(inputs[0]);
+					}
+				});
+				checkBoxes[0].setBackground(SystemColor.controlHighlight);
+				checkBoxes[0].setBounds(255, 24, 26, 20);
+				getContentPane().add(checkBoxes[0]);
+				// Nombre
+				checkBoxes[1] = new JCheckBox("");
+				checkBoxes[1].setBackground(SystemColor.controlHighlight);
+				checkBoxes[1].setBounds(255, 55, 26, 20);
+				checkBoxes[1].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(inputs[1]);
+					}
+				});
+				getContentPane().add(checkBoxes[1]);
+				// Apellido
+				checkBoxes[2] = new JCheckBox("");
+				checkBoxes[2].setBackground(SystemColor.controlHighlight);
+				checkBoxes[2].setBounds(255, 88, 26, 20);
+				checkBoxes[2].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(inputs[2]);
+						}
+					});
+				getContentPane().add(checkBoxes[2]);
+				// Genero
+				checkBoxes[9] = new JCheckBox("");
+				checkBoxes[9].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(switchGenero);
+					}
+				});
+				checkBoxes[9].setBackground(SystemColor.controlHighlight);
+				checkBoxes[9].setBounds(255, 119, 26, 20);
+				getContentPane().add(checkBoxes[9]);
+				// Mail
+				checkBoxes[3] = new JCheckBox("");
+				checkBoxes[3].setEnabled(false);
+				checkBoxes[3].setBackground(SystemColor.controlHighlight);
+				checkBoxes[3].setBounds(255, 153, 26, 20);
+				checkBoxes[3].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(inputs[3]);
+					}
+				});
+				getContentPane().add(checkBoxes[3]);
+				// Telefono
+				checkBoxes[4] = new JCheckBox("");
+				checkBoxes[4].setEnabled(false);
+				checkBoxes[4].setBackground(SystemColor.controlHighlight);
+				checkBoxes[4].setBounds(255, 184, 26, 20);
+				checkBoxes[4].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(inputs[4]);
+					}
+				});
+				getContentPane().add(checkBoxes[4]);
+				// Calle
+				checkBoxes[5] = new JCheckBox("");
+				checkBoxes[5].setEnabled(false);
+				checkBoxes[5].setBackground(SystemColor.controlHighlight);
+				checkBoxes[5].setBounds(255, 215, 26, 20);
+				checkBoxes[5].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(inputs[5]);
+					}
+				});
+				getContentPane().add(checkBoxes[5]);
+				// Numero
+				checkBoxes[6] = new JCheckBox("");
+				checkBoxes[6].setEnabled(false);
+				checkBoxes[6].setBackground(SystemColor.controlHighlight);
+				checkBoxes[6].setBounds(255, 246, 26, 20);
+				checkBoxes[6].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(inputs[6]);
+					}
+				});
+				getContentPane().add(checkBoxes[6]);
+				// Piso
+				checkBoxes[7] = new JCheckBox("");
+				checkBoxes[7].setEnabled(false);
+				checkBoxes[7].setBackground(SystemColor.controlHighlight);
+				checkBoxes[7].setBounds(255, 277, 26, 20);
+				checkBoxes[7].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(inputs[7]);
+					}
+				});
+				getContentPane().add(checkBoxes[7]);
+				// Depto
+				checkBoxes[8] = new JCheckBox("");
+				checkBoxes[8].setEnabled(false);
+				checkBoxes[8].setBackground(SystemColor.controlHighlight);
+				checkBoxes[8].setBounds(255, 308, 26, 20);
+				checkBoxes[8].addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						switchearEstadoInput(inputs[8]);
+					}
+				});
+				getContentPane().add(checkBoxes[9]);
 				
+				// CREACIÓN DE LABELS: registro de alumno
+				
+				JLabel lblDNI = new JLabel("DNI:");
+				lblDNI.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblDNI.setBounds(74, 24, 41, 20);
+				getContentPane().add(lblDNI);
+				
+				JLabel lblNombre = new JLabel("Nombre:");
+				lblNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblNombre.setBounds(56, 55, 59, 20);
+				getContentPane().add(lblNombre);
+				
+				JLabel lblApellido = new JLabel("Apellido:");
+				lblApellido.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblApellido.setBounds(56, 88, 59, 20);
+				getContentPane().add(lblApellido);
+				
+				JLabel lblGenero = new JLabel("G\u00E9nero:");
+				lblGenero.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblGenero.setBounds(58, 119, 57, 20);
+				getContentPane().add(lblGenero);
+				
+				JLabel lblMail = new JLabel("Mail:");
+				lblMail.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblMail.setBounds(74, 153, 41, 20);
+				getContentPane().add(lblMail);
+				
+				JLabel lblTelfono = new JLabel("Tel\u00E9fono:");
+				lblTelfono.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblTelfono.setBounds(44, 184, 71, 20);
+				getContentPane().add(lblTelfono);
+				
+				JLabel lblCalle = new JLabel("Calle:");
+				lblCalle.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblCalle.setBounds(72, 215, 41, 20);
+				getContentPane().add(lblCalle);
+				
+				JLabel lblNum = new JLabel("N\u00B0:");
+				lblNum.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblNum.setBounds(74, 246, 41, 20);
+				getContentPane().add(lblNum);
+				
+				JLabel lblPiso = new JLabel("Piso:");
+				lblPiso.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblPiso.setBounds(74, 277, 39, 20);
+				getContentPane().add(lblPiso);
+				
+				JLabel lblDepto = new JLabel("Depto:");
+				lblDepto.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+				lblDepto.setBounds(56, 308, 59, 20);
+				getContentPane().add(lblDepto);
+				
+				btnSiguiente = new JButton("Guardar");
+				btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+				btnSiguiente.addActionListener(new ActionListener() {
+					public void actionPerformed(ActionEvent e) {
+						modificarAlumno(lu);
+						dispose();
+					}
+				});
+				btnSiguiente.setBounds(107, 354, 124, 23);
+				getContentPane().add(btnSiguiente);
+			}
+				
+				/**
+				 * switchearEstadoInput: permite alternar el estado de un componente
+				   que puede ser habilitado o deshabilitado
+				 * @param in: componente a habilitar/deshabilitar
+				 */
 				private void switchearEstadoInput (JComponent in) {
 					if (in.isEnabled()) {
 						in.setEnabled(false);
 					}
 					else in.setEnabled(true);
 				}
-				   
-				   
-				   private void modificarAlumno (int lu)
-				   {
-					  ConectorBD.obtenerConectorBD().conectarBD();
-				      try
-				      {
-				    	  // Creo un comando JDBC para realizar la inserción en la BD
-				    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-				    	  int cantInputs = inputsHabilitados();
-				    	  // Genero la sentencia de inserción
-				    	  String sql = "UPDATE alumnos SET ";
-				    	  // Si quiero modificar el DNI...
-				    	  if (inputs[0].isEnabled()) {
-				    		  sql += "dni = " + inputs[0].getText();
-				    		  cantInputs--;
-				    		  if (cantInputs > 0) {
-				    			  sql += ", ";
-				    		  }
-				    	  }
-				    	// Si quiero modificar el Nombre...
-				    	  if (inputs[1].isEnabled()) {
-				    		  sql += "nombre = \'" + inputs[1].getText() + "\'";
-				    		  cantInputs--;
-				    		  if (cantInputs > 0) {
-				    			  sql += ", ";
-				    		  }
-				    	  }
-				    	// Si quiero modificar el Apellido...
-				    	  if (inputs[2].isEnabled()) {
-				    		  sql += "apellido = \'" + inputs[2].getText() + "\'";
-				    		  cantInputs--;
-				    		  if (cantInputs > 0) {
-				    			  sql += ", ";
-				    		  }
-				    	  }
-				    	// Si quiero modificar el Género...
-				    	  if (switchGenero.isEnabled()) {
-				    		  sql += "genero = \'" + switchGenero.getSelectedItem() + "\'";
-				    	  }
-				    	  sql += " WHERE (LU = " + lu + ");";
-
-				         // Ejecuto la inserción del nuevo alumno
-				         stmt.executeUpdate(sql);
-				         JOptionPane.showMessageDialog(this,"Alumno con LU: " + lu +" modificado exitosamente");
-				         stmt.close();
-				         dispose();	         
-				      }
-				      catch (SQLException ex)
-				      {
-				         // en caso de error, se muestra la causa en la consola
-				         System.out.println("SQLException: " + ex.getMessage());
-				         System.out.println("SQLState: " + ex.getSQLState());
-				         System.out.println("VendorError: " + ex.getErrorCode());
-				      }
-				      
-				      ConectorBD.obtenerConectorBD().desconectarBD();
-				      //actualizarListaAlumnos();
-				   }
-				   
-
-				   private int inputsHabilitados () {
-					   int cant = 0;
-					   int i;
-					   for (i=0; i < inputs.length; i++) {
-						   if (inputs[i].isEnabled()) {
-							   cant++;
-						   }
-					   }
-					   return cant;		
-				   }
-			}
-		   
-		   
-		   
-	}
+				
+				/**
+				 * modificarAlumno: permite cambiar los datos de registro para un alumno
+				   particular
+				 * @param lu: número de libreta universitaria asociado al alumno a modificar
+				 */
+				private void modificarAlumno (int lu) {
+					String [] datosInputs = new String [5];
+					boolean modificoAlgo = false;
+					datosInputs[0] = lu + "";
+					try
+					{
+						// Verifico si se quiere modificar DNI
+						if (inputs[1].isEnabled()) {
+							datosInputs[1] = inputs[0].getText();
+							modificoAlgo = true;
+						}
+						else {
+							datosInputs[1] = null;
+						}
+						// Verifico si se quiere modificar Nombre
+						if (inputs[1].isEnabled()) {
+							datosInputs[2] = inputs[1].getText();
+							modificoAlgo = true;
+						}
+						else {
+							datosInputs[2] = null;
+						}
+						// Verifico si se quiere modificar Apellido
+						if (inputs[2].isEnabled()) {
+							datosInputs[3] = inputs[2].getText();
+							modificoAlgo = true;
+						}
+						else {
+							datosInputs[3] = null;
+						}
+						// Verifico si se quiere modificar Genero
+						if (switchGenero.isEnabled()) {
+							datosInputs[4] = (String) switchGenero.getSelectedItem();
+							modificoAlgo = true;
+						}
+						else {
+							datosInputs[4] = null;
+						}
+						// Ejecuto la inserción del nuevo alumno
+						ControladorAlumno.controlador().modificar(datosInputs);
+						if (modificoAlgo) {
+							JOptionPane.showMessageDialog(this,"Alumno con LU: " + lu +" modificado exitosamente");
+							actualizarListaAlumnos();
+						}						
+						dispose();
+					}
+					catch (ExcepcionRegistro ex)
+					{
+						// en caso de error, se muestra la causa en la consola
+						JOptionPane.showMessageDialog(this,"ERROR");
+					}
+					ConectorBD.obtenerConectorBD().desconectarBD();
+				    actualizarListaAlumnos();
+				}		   
+		   }		   
+		}	
 	
 	
-	
-	// CLASE PARA LA VENTANA DE INPUTS PARA LA BAJA
+		// CLASE PARA LA VENTANA DE INPUTS PARA LA BAJA
 	
 		private class VentanaElimAlumno extends JFrame {
 			
@@ -848,9 +795,9 @@ public class VistaAdminAlumnos extends JPanel {
 			private JTextField inputLU;
 			private JButton btnSiguiente;
 			
-			
-			// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
-			
+			/**
+			 * CONSTRUCTOR: Ventana para el registro de un nuevo alumno
+			 */
 			public VentanaElimAlumno() {
 				super();
 				getContentPane().setLayout(null);
@@ -879,8 +826,7 @@ public class VistaAdminAlumnos extends JPanel {
 				btnSiguiente = new JButton("Dar de baja");
 				btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 				btnSiguiente.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						
+					public void actionPerformed(ActionEvent e) {						
 						eliminarAlumno();
 						dispose();
 					}
@@ -889,37 +835,28 @@ public class VistaAdminAlumnos extends JPanel {
 				getContentPane().add(btnSiguiente);
 				
 			}
-			
-			
-			// CONEXIÓN Y DESCONEXIÓN DE LA BASE DE DATOS	   
-			   
-			   private void eliminarAlumno ()
-			   {
-				  ConectorBD.obtenerConectorBD().conectarBD();
-			      try
-			      {
-			         // Creo un comando JDBC para realizar la inserción en la BD
-			         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-			         // Genero la sentencia de inserción	         
-			         String sql = "DELETE FROM alumnos WHERE ( LU = " + inputLU.getText() + ")";
 
-			         // Ejecuto la eliminación del alumno
-			         stmt.executeUpdate(sql);
-			         JOptionPane.showMessageDialog(this,"Alumno dado de baja exitosamente");
-			         stmt.close();
-			         dispose();	         
-			      }
-			      catch (SQLException ex)
-			      {
-			         // en caso de error, se muestra la causa en la consola
-			         System.out.println("SQLException: " + ex.getMessage());
-			         System.out.println("SQLState: " + ex.getSQLState());
-			         System.out.println("VendorError: " + ex.getErrorCode());
-			      }
-			      
-			      ConectorBD.obtenerConectorBD().desconectarBD();
-			      actualizarListaAlumnos();
-			   }
+			
+			/**
+			 * eliminarAlumno: solicita la baja de un alumno, con cierto LU, que está
+			   registrado en el sistema
+			 */
+			private void eliminarAlumno () {
+				try
+				{
+					ControladorAlumno.controlador().eliminar(inputLU.getText());
+					JOptionPane.showMessageDialog(this,"Alumno dado de baja exitosamente");
+					actualizarListaAlumnos();
+					dispose();
+				}
+				catch (ExcepcionEliminacion ex)
+				{
+					JOptionPane.showMessageDialog(this,"Error en eliminación: el alumno con LU: " +
+							inputLU.getText() + " no pudo ser dado de baja");
+				}
+			}
 			   
 		}
+	
+		
 }

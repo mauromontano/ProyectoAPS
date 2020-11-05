@@ -1,5 +1,8 @@
 import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
+
+import Controladores.ControladorVistas;
+
 import java.awt.Dimension;
 import java.awt.SystemColor;
 import Vistas.*;
@@ -43,7 +46,7 @@ public class VentanaPrincipal extends JFrame {
 		getContentPane().add(VistaAdminMaterias.vista());
 		getContentPane().add(VistaAdminPlanes.vista());
 		
-		VistaInicio.vista().setVisible(true);
+		ControladorVistas.controlador();
 		VistaAlumno.vista().setVisible(false);
 		VistaProfesor.vista().setVisible(false);
 		VistaAdmin.vista().setVisible(false);

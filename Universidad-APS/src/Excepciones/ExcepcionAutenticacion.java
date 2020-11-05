@@ -10,7 +10,6 @@ public class ExcepcionAutenticacion extends Exception {
 	 */
 	public ExcepcionAutenticacion (String msg) {
 		super(msg);
-	}
-	
+	}	
 
 }

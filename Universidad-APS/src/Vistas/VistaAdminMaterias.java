@@ -4,6 +4,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 
 import Conector.ConectorBD;
+import Controladores.ControladorVistas;
 
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
@@ -106,8 +107,8 @@ public class VistaAdminMaterias extends JPanel {
         JButton btnAtras = new JButton("Atr\u00E1s");
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		setVisible(false);
-        		VistaAdmin.vista().setVisible(true);
+        		// Vuelvo a la vista anterior, la vista de administración
+        		ControladorVistas.controlador().mostrar(VistaAdmin.vista());
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));

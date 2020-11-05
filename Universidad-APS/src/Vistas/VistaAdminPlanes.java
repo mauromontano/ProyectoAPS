@@ -21,6 +21,8 @@ import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import Conector.ConectorBD;
+import Controladores.ControladorPlan;
+import Controladores.ControladorVistas;
 import quick.dbtable.DBTable;
 
 
@@ -105,13 +107,31 @@ public class VistaAdminPlanes extends JPanel {
         JButton btnAtras = new JButton("Atr\u00E1s");
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		setVisible(false);
-        		VistaAdmin.vista().setVisible(true);
+        		// Vuelvo a la vista anterior, la vista de administración
+        		ControladorVistas.controlador().mostrar(VistaAdmin.vista());
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
         btnAtras.setBounds(10, 11, 70, 23);
         add(btnAtras);
+        
+        JButton btnAgregarMatPlan = new JButton("Agregar materia a plan");
+        btnAgregarMatPlan.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		new VentanaAgregarMat();
+        	}
+        });
+        btnAgregarMatPlan.setBounds(419, 148, 143, 40);
+        add(btnAgregarMatPlan);
+        
+        JButton btnRegCorrelativa = new JButton("Registrar correlativa");
+        btnRegCorrelativa.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		new VentanaAgregarCor();
+        	}
+        });
+        btnRegCorrelativa.setBounds(612, 148, 143, 40);
+        add(btnRegCorrelativa);
                 
         actualizarListaPlanes();
 	}
@@ -171,10 +191,10 @@ public class VistaAdminPlanes extends JPanel {
 	
 	// CLASE PARA LA VENTANA DE INPUTS PARA EL REGISTRO
 	
-	public class VentanaRegPlan extends JFrame {
+	private class VentanaRegPlan extends JFrame {
 		
 		private static final long serialVersionUID = 1L;	
-		private JTextField inputNombre;
+		private JTextField inputIdCarrera;
 		private JTextField inputVersion;
 		private JLabel lblNombre;
 		private JLabel lblVersion;
@@ -187,7 +207,7 @@ public class VistaAdminPlanes extends JPanel {
 	        setVisible(true);
 	        
 	        getContentPane().setBackground(SystemColor.controlHighlight);
-			setTitle("Registro de nueva materia");
+			setTitle("Registro de nueva plan");
 			setMaximumSize(new Dimension(395, 245));
 			setMinimumSize(new Dimension(395, 245));
 			setResizable(false);		
@@ -195,16 +215,16 @@ public class VistaAdminPlanes extends JPanel {
 				
 			// CREACIÓN DE INPUTS
 			
-			inputNombre = new JTextField();
-			inputNombre.setColumns(10);
-			inputNombre.setBounds(159, 55, 178, 20);
-			getContentPane().add(inputNombre);
+			inputIdCarrera = new JTextField();
+			inputIdCarrera.setColumns(10);
+			inputIdCarrera.setBounds(159, 55, 178, 20);
+			getContentPane().add(inputIdCarrera);
 			
 			inputVersion = new JTextField();
 			inputVersion.setBounds(159, 89, 48, 20);
 			getContentPane().add(inputVersion);
 			
-			lblNombre = new JLabel("Carrera asociada:");
+			lblNombre = new JLabel("ID de carrera asociada:");
 			lblNombre.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 12));
 			lblNombre.setBounds(51, 54, 98, 20);
 			getContentPane().add(lblNombre);
@@ -237,9 +257,9 @@ public class VistaAdminPlanes extends JPanel {
 		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
 		         	         
 		         // Genero la sentencia de inserción	         
-		         String sql = "INSERT INTO planes (nombre_carrera, version) VALUES (" + 
-		        		 	  "\'" + inputNombre.getText() +
-		        		 	  "\'," + inputVersion.getText() + ");";
+		         String sql = "INSERT INTO planes (id_carrera, version) VALUES (" + 
+		        		 	  inputIdCarrera.getText() + "," +
+		        		 	  inputVersion.getText() + ");";
 
 		         // Ejecuto la inserción del nuevo alumno
 		         stmt.executeUpdate(sql);
@@ -265,7 +285,7 @@ public class VistaAdminPlanes extends JPanel {
 	private class VentanaBuscarPlan extends JFrame {
 		
 		private static final long serialVersionUID = 1L;
-		private JTextField inputNombre;
+		private JTextField inputIdCarrera;
 		private JTextField inputVersion;
 		private JButton btnSiguiente;
 		;
@@ -286,10 +306,10 @@ public class VistaAdminPlanes extends JPanel {
 				
 			// CREACIÓN DE INPUTS
 			
-			inputNombre = new JTextField();
-			inputNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			inputNombre.setBounds(159, 29, 188, 20);
-			getContentPane().add(inputNombre);
+			inputIdCarrera = new JTextField();
+			inputIdCarrera.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputIdCarrera.setBounds(159, 29, 188, 20);
+			getContentPane().add(inputIdCarrera);
 			
 			// CREACIÓN DE LABELS
 			
@@ -330,18 +350,18 @@ public class VistaAdminPlanes extends JPanel {
 		         // Creo un comando JDBC para realizar la inserción en la BD
 		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
 		         // Genero la sentencia de inserción	         
-		         String sql = "SELECT * FROM planes WHERE (nombre_carrera = " + inputNombre.getText() + ")";
+		         String sql = "SELECT * FROM planes WHERE (id_carrera = " + inputIdCarrera.getText() + ")";
 
 		         // Ejecuto la eliminación del alumno
 		         ResultSet rs = stmt.executeQuery(sql);
 		         if (!rs.next()) {
 		        	 JOptionPane.showMessageDialog(this,
 		        			 "ERROR! No existe el plan \'" + inputVersion.getText() + "\'" + 
-		        			 " para la carrera: " + inputNombre.getText(),
+		        			 " para la carrera: " + inputIdCarrera.getText(),
 		        			 "Modificación de un plan", JOptionPane.ERROR_MESSAGE);
 		         }
 		         else {
-		        	 new VentanaEdicionPlan(inputNombre.getText());			        	 
+		        	 new VentanaEdicionPlan(inputIdCarrera.getText());			        	 
 		         }
 		         stmt.close();
 		         dispose();	         
@@ -610,5 +630,4 @@ public class VistaAdminPlanes extends JPanel {
 			      actualizarListaPlanes();
 			   }
 		}
-
 }

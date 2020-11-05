@@ -12,6 +12,9 @@ import javax.swing.JLabel;
 import java.awt.Font;
 import javax.swing.SwingConstants;
 import javax.swing.border.LineBorder;
+
+import Controladores.ControladorVistas;
+
 import java.awt.Color;
 import javax.swing.JTabbedPane;
 
@@ -34,15 +37,15 @@ public abstract class VistaHome extends JPanel {
 		JButton btnAtras = new JButton("Atr\u00E1s");
         btnAtras.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		setVisible(false);
-        		VistaInicio.vista().setVisible(true);
+        		// Vuelvo a la vista anterior, la vista de inicio
+        		ControladorVistas.controlador().mostrar(VistaInicio.vista());
         	}
         });
         btnAtras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
         btnAtras.setBounds(22, 73, 70, 23);
         add(btnAtras);
 		
-		lblIdentidad = new JLabel("Manuel Michelis - LU: 104434");
+		lblIdentidad = new JLabel("");
 		lblIdentidad.setForeground(SystemColor.desktop);
 		lblIdentidad.setHorizontalAlignment(SwingConstants.CENTER);
 		lblIdentidad.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 16));

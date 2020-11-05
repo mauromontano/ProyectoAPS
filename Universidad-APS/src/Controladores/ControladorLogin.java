@@ -38,6 +38,8 @@ public class ControladorLogin {
 		boolean formatoInvalido = false;
 		// Si el usuario es administrador, accedo a su correspondiente vista
 		if (cat.contentEquals("Administrador")) {
+			ControladorVistas.controlador().mostrar(VistaAdmin.vista());
+			/*
 			if (us.contentEquals("admin_uni") && pswd.contentEquals("pwadmin")) {
 				// Solicito al controlador de vistas el swap a la vista home de administrador
 				ControladorVistas.controlador().mostrar(VistaAdmin.vista());
@@ -46,6 +48,7 @@ public class ControladorLogin {
 			{
 				formatoInvalido = true;
 			}
+			*/
 		}
 		
 		// El usuario no es de tipo administrador, debo confirmar la autenticación con datos de la BD
@@ -61,9 +64,10 @@ public class ControladorLogin {
 				if (cat.contentEquals("Alumno")) 
 				{
 					consultaSQL += "alumnos WHERE (LU = " + us + " AND dni = " + pswd + ");";
+					Alumno alumno;
 					ResultSet rs = stmt.executeQuery(consultaSQL);
 					if (rs.next()) {
-						Alumno alumno = Alumno.siguienteModelo(rs);
+						alumno = Alumno.siguienteModelo(rs);
 						VistaAlumno.vista().generarVistaAlumno(alumno);
 						// Solicito al controlador de vistas el swap a la vista home de alumno
 						ControladorVistas.controlador().mostrar(VistaAlumno.vista());
