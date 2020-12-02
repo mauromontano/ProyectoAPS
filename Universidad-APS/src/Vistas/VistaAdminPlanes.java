@@ -1,7 +1,7 @@
 package Vistas;
+
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -13,18 +13,18 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
-import Conector.ConectorBD;
+
+import Controladores.ControladorMateria;
 import Controladores.ControladorPlan;
 import Controladores.ControladorVistas;
+import Excepciones.DBRetrieveException;
+import Excepciones.DBUpdateException;
+import Modelos.Plan;
 import quick.dbtable.DBTable;
-
 
 public class VistaAdminPlanes extends JPanel {
 	
@@ -61,7 +61,7 @@ public class VistaAdminPlanes extends JPanel {
 				new VentanaRegPlan();
 			}
 		});
-		btnRegPlan.setBounds(323, 39, 167, 40);
+		btnRegPlan.setBounds(313, 39, 177, 40);
 		this.add(btnRegPlan);
 		
 		tabla = new DBTable();
@@ -91,7 +91,7 @@ public class VistaAdminPlanes extends JPanel {
         	}
         });
         btnModPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-        btnModPlan.setBounds(323, 90, 167, 40);
+        btnModPlan.setBounds(313, 90, 177, 40);
         add(btnModPlan);
         
         JButton btnBajaPlan = new JButton("Dar de baja plan");
@@ -101,7 +101,7 @@ public class VistaAdminPlanes extends JPanel {
         	}
         });
         btnBajaPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-        btnBajaPlan.setBounds(323, 141, 167, 40);
+        btnBajaPlan.setBounds(313, 141, 177, 40);
         add(btnBajaPlan);
         
         JButton btnAtras = new JButton("Atr\u00E1s");
@@ -122,7 +122,7 @@ public class VistaAdminPlanes extends JPanel {
         		new VentanaAgregarMat();
         	}
         });
-        btnAgregarMatPlan.setBounds(696, 39, 171, 40);
+        btnAgregarMatPlan.setBounds(696, 39, 177, 40);
         add(btnAgregarMatPlan);
         
         JButton btnRegCorrelativa = new JButton("Registrar correlativa");
@@ -132,10 +132,10 @@ public class VistaAdminPlanes extends JPanel {
         		new VentanaAgregarCor();
         	}
         });
-        btnRegCorrelativa.setBounds(696, 90, 171, 40);
+        btnRegCorrelativa.setBounds(696, 90, 177, 40);
         add(btnRegCorrelativa);
                 
-        actualizarListaPlanes();
+        actualizarTabla();
 	}
 	
 	
@@ -163,30 +163,15 @@ public class VistaAdminPlanes extends JPanel {
 	}
 	
 	
-	private void actualizarListaPlanes () {
-		ConectorBD.obtenerConectorBD().conectarBD(tabla);
+	private void actualizarTabla () {
 		try
 	    {
-			String consultaPlanes = "SELECT * FROM planes ";
-			tabla.setSelectSql(consultaPlanes.trim());
-			// Obtengo el modelo de la DB Table para actualizar el contenido de la lista de alumnos
-	    	tabla.createColumnModelFromQuery();
-	    	// actualizamos el contenido de la tabla.   	     	  
-	    	tabla.refresh();
+			ControladorPlan.controlador().volcar(tabla);
+	    }		
+		catch (DBRetrieveException ex)
+		{
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Volcado de datos de planes", JOptionPane.ERROR_MESSAGE);
 	    }
-		
-		catch (SQLException ex)
-	    {
-	         // en caso de error, se muestra la causa en la consola
-	         System.out.println("SQLException: " + ex.getMessage());
-	         System.out.println("SQLState: " + ex.getSQLState());
-	         System.out.println("VendorError: " + ex.getErrorCode());
-	         JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
-	        		 					   ex.getMessage() + "\n",
-	        		 					   "ERROR! No se pudo cargar la lista de planes",
-	                                       JOptionPane.ERROR_MESSAGE);
-	    }
-		ConectorBD.obtenerConectorBD().desconectarBD(tabla);
 	}
 	
 	
@@ -198,7 +183,7 @@ public class VistaAdminPlanes extends JPanel {
 		private static final long serialVersionUID = 1L;	
 		private JTextField inputIdCarrera;
 		private JTextField inputVersion;
-		private JLabel lblNombre;
+		private JLabel lblId;
 		private JLabel lblVersion;
 		private JButton btnSiguiente;
 		
@@ -210,8 +195,7 @@ public class VistaAdminPlanes extends JPanel {
 	        
 	        getContentPane().setBackground(SystemColor.controlHighlight);
 			setTitle("Registro de nueva plan");
-			setMaximumSize(new Dimension(395, 245));
-			setMinimumSize(new Dimension(395, 245));
+			setSize(395, 187);
 			setResizable(false);		
 			setLocationRelativeTo(null);
 				
@@ -219,21 +203,21 @@ public class VistaAdminPlanes extends JPanel {
 			
 			inputIdCarrera = new JTextField();
 			inputIdCarrera.setColumns(10);
-			inputIdCarrera.setBounds(159, 55, 178, 20);
+			inputIdCarrera.setBounds(159, 40, 178, 20);
 			getContentPane().add(inputIdCarrera);
 			
 			inputVersion = new JTextField();
-			inputVersion.setBounds(159, 89, 48, 20);
+			inputVersion.setBounds(159, 74, 97, 20);
 			getContentPane().add(inputVersion);
 			
-			lblNombre = new JLabel("ID de carrera asociada:");
-			lblNombre.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 12));
-			lblNombre.setBounds(51, 54, 98, 20);
-			getContentPane().add(lblNombre);
+			lblId = new JLabel("ID de carrera:");
+			lblId.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 12));
+			lblId.setBounds(67, 39, 82, 20);
+			getContentPane().add(lblId);
 			
 			lblVersion = new JLabel("Version:");
 			lblVersion.setFont(new Font("Microsoft JhengHei UI Light", Font.PLAIN, 12));
-			lblVersion.setBounds(67, 88, 82, 20);
+			lblVersion.setBounds(97, 72, 54, 20);
 			getContentPane().add(lblVersion);
 			
 			btnSiguiente = new JButton("Guardar");
@@ -244,51 +228,34 @@ public class VistaAdminPlanes extends JPanel {
 					dispose();
 				}
 			});
-			btnSiguiente.setBounds(132, 153, 124, 23);
+			btnSiguiente.setBounds(132, 116, 124, 23);
 			getContentPane().add(btnSiguiente);
 			
 		}
 		
 		
-		private void registrarPlan ()
-		{
-			ConectorBD.obtenerConectorBD().conectarBD();
+		private void registrarPlan () {
+			String [] in = {inputIdCarrera.getText(), inputVersion.getText()};
 			try
-		      {
-		         // Creo un comando JDBC para realizar la inserción en la BD
-		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		         	         
-		         // Genero la sentencia de inserción	         
-		         String sql = "INSERT INTO planes (id_carrera, version) VALUES (" + 
-		        		 	  inputIdCarrera.getText() + "," +
-		        		 	  inputVersion.getText() + ");";
-
-		         // Ejecuto la inserción del nuevo alumno
-		         stmt.executeUpdate(sql);
-		         // Notifico éxito en la operación
-		         JOptionPane.showMessageDialog(this,"Plan registrado exitosamente");	         
-		         stmt.close();
-		         dispose();
-		         
-		      }
-		      catch (SQLException ex)
-		      {
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
-		      }
-			ConectorBD.obtenerConectorBD().desconectarBD();
+			{
+				ControladorPlan.controlador().registrar(in);
+				// Notifico éxito en la operación
+				JOptionPane.showMessageDialog(this,"Plan registrado exitosamente");
+				actualizarTabla();
+				dispose();
+			}
+			catch (DBUpdateException ex)
+			{
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Registro de un plan", JOptionPane.ERROR_MESSAGE);
+			}
 		}
 		
 	}
 	
 	
 	private class VentanaBuscarPlan extends JFrame {
-		
 		private static final long serialVersionUID = 1L;
 		private JTextField inputIdCarrera;
-		private JTextField inputVersion;
 		private JButton btnSiguiente;
 		;
 		
@@ -302,7 +269,7 @@ public class VistaAdminPlanes extends JPanel {
 	        
 	        getContentPane().setBackground(SystemColor.controlHighlight);
 			setTitle("Modificación de un plan");
-			setSize(new Dimension(400, 177));
+			setSize(new Dimension(356, 145));
 			setResizable(false);		
 			setLocationRelativeTo(null);
 				
@@ -310,166 +277,113 @@ public class VistaAdminPlanes extends JPanel {
 			
 			inputIdCarrera = new JTextField();
 			inputIdCarrera.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			inputIdCarrera.setBounds(159, 29, 188, 20);
+			inputIdCarrera.setBounds(129, 29, 157, 20);
 			getContentPane().add(inputIdCarrera);
 			
 			// CREACIÓN DE LABELS
 			
-			JLabel lblLU = new JLabel("Nombre de carrera:");		
-			lblLU.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			lblLU.setBounds(41, 29, 108, 20);
-			getContentPane().add(lblLU);
+			JLabel lblId = new JLabel("ID del plan:");		
+			lblId.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			lblId.setBounds(50, 29, 69, 20);
+			getContentPane().add(lblId);
 			
 			btnSiguiente = new JButton("A modificar");
 			btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 			btnSiguiente.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {						
-					abrirEdicionCarrera();
+					abrirEdicionPlan();
 					dispose();
 				}
 			});
-			btnSiguiente.setBounds(133, 104, 124, 23);
+			btnSiguiente.setBounds(114, 75, 124, 23);
 			getContentPane().add(btnSiguiente);
-			
-			inputVersion = new JTextField();
-			inputVersion.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			inputVersion.setBounds(159, 60, 75, 20);
-			getContentPane().add(inputVersion);
-			
-			JLabel lblVersion = new JLabel("Versi\u00F3n:");
-			lblVersion.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			lblVersion.setBounds(104, 60, 45, 20);
-			getContentPane().add(lblVersion);
 			
 		}
 		
 		
-		   private void abrirEdicionCarrera ()
-		   {
-			  ConectorBD.obtenerConectorBD().conectarBD();
-		      try
-		      {
-		         // Creo un comando JDBC para realizar la inserción en la BD
-		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		         // Genero la sentencia de inserción	         
-		         String sql = "SELECT * FROM planes WHERE (id_carrera = " + inputIdCarrera.getText() + ")";
-
-		         // Ejecuto la eliminación del alumno
-		         ResultSet rs = stmt.executeQuery(sql);
-		         if (!rs.next()) {
-		        	 JOptionPane.showMessageDialog(this,
-		        			 "ERROR! No existe el plan \'" + inputVersion.getText() + "\'" + 
-		        			 " para la carrera: " + inputIdCarrera.getText(),
-		        			 "Modificación de un plan", JOptionPane.ERROR_MESSAGE);
-		         }
-		         else {
-		        	 new VentanaEdicionPlan(inputIdCarrera.getText());			        	 
-		         }
-		         stmt.close();
-		         dispose();	         
-		      }
-		      catch (SQLException ex)
-		      {
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
-		      }
-		      
-		      ConectorBD.obtenerConectorBD().desconectarBD();
-		      actualizarListaPlanes();
-		   }
-		   
+		private void abrirEdicionPlan () {
+			String [] inputs = {inputIdCarrera.getText(), null, null};
+			Plan plan = null;
+			try
+			{
+				plan = ControladorPlan.controlador().recuperar(inputs);
+				if (plan == null) {
+					JOptionPane.showMessageDialog(this,
+							"ERROR! No existe un plan registrada con ID: " + inputIdCarrera.getText(),
+							"Modificación de una materia", JOptionPane.ERROR_MESSAGE);
+				}
+				else {
+					new VentanaEdicionPlan(plan);
+				}
+			}
+			catch (DBRetrieveException ex)
+			{
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Modificación de una materia", JOptionPane.ERROR_MESSAGE);
+			}
+			dispose();
+		}
+		
 		   
 		   private class VentanaEdicionPlan extends JFrame {
 			   
 				private static final long serialVersionUID = 1L;
-				private JTextField [] inputs;
-				private JCheckBox [] checkBoxes;
+				private JTextField inputVersion;
+				private JCheckBox checkBoxVersion;
 				private JButton btnSiguiente;
 				
 				
 				// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
 				
-				public VentanaEdicionPlan(String nombreCarrera) {
+				public VentanaEdicionPlan(Plan plan) {
 					super();
 					getContentPane().setEnabled(false);
 					getContentPane().setLayout(null);
 			        setVisible(true);
 			        
 			        getContentPane().setBackground(SystemColor.controlHighlight);
-					setTitle("Modificación de una carrera");
-					setSize(new Dimension(322, 185));
-					setMinimumSize(new Dimension(322, 185));
+					setTitle("Modificación de un plan");
+					setSize(322, 139);
 					setResizable(false);		
 					setLocationRelativeTo(null);
 						
 					// CREACIÓN DE INPUTS
 					
-					inputs = new JTextField[2];
-					checkBoxes = new JCheckBox[2];
-					
-					// Nombre de materia
-					inputs[0] = new JTextField();
-					inputs[0].setEnabled(false);
-					inputs[0].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[0].setBounds(125, 24, 124, 20);
-					getContentPane().add(inputs[0]);
-					inputs[0].setColumns(10);
-					
-					// Carga horaria
-					inputs[1] = new JTextField();
-					inputs[1].setEnabled(false);
-					inputs[1].setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					inputs[1].setColumns(10);
-					inputs[1].setBounds(124, 55, 125, 20);
-					getContentPane().add(inputs[1]);
+					inputVersion = new JTextField();
+					inputVersion.setEnabled(false);
+					inputVersion.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+					inputVersion.setBounds(107, 24, 127, 20);
+					getContentPane().add(inputVersion);
+					inputVersion.setColumns(10);
 							
 					// CREACIÓN DE CHECKBOXES
 					
 					// Nombre de materia
-					checkBoxes[0] = new JCheckBox("");
-					checkBoxes[0].addActionListener(new ActionListener() {
+					checkBoxVersion = new JCheckBox("");
+					checkBoxVersion.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[0]);
+							switchearEstadoInput(inputVersion);
 						}
 					});
-					checkBoxes[0].setBackground(SystemColor.controlHighlight);
-					checkBoxes[0].setBounds(255, 24, 26, 20);
-					getContentPane().add(checkBoxes[0]);
-					
-					// Carga horaria
-					checkBoxes[1] = new JCheckBox("");
-					checkBoxes[1].setBackground(SystemColor.controlHighlight);
-					checkBoxes[1].setBounds(255, 55, 26, 20);
-					checkBoxes[1].addActionListener(new ActionListener() {
-						public void actionPerformed(ActionEvent e) {
-							switchearEstadoInput(inputs[1]);
-						}
-					});
-					getContentPane().add(checkBoxes[1]);
+					checkBoxVersion.setBackground(SystemColor.controlHighlight);
+					checkBoxVersion.setBounds(245, 24, 26, 20);
+					getContentPane().add(checkBoxVersion);
 					
 					// CREACIÓN DE LABELS
 					
-					JLabel lblNombre = new JLabel("Nombre:");
-					lblNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));;
-					lblNombre.setBounds(47, 24, 68, 20);
-					getContentPane().add(lblNombre);
-					
-					JLabel lblCarga = new JLabel("Duraci\u00F3n:");		
-					lblCarga.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-					lblCarga.setBounds(47, 55, 68, 20);
-					getContentPane().add(lblCarga);		
+					JLabel lblId = new JLabel("Versi\u00F3n:");
+					lblId.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));;
+					lblId.setBounds(46, 24, 51, 20);
+					getContentPane().add(lblId);	
 					
 					btnSiguiente = new JButton("Guardar");
 					btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 					btnSiguiente.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {				
-							modificarPlan(nombreCarrera);
+							modificarPlan(plan);
 							dispose();
 						}
 					});
-					btnSiguiente.setBounds(95, 101, 124, 23);
+					btnSiguiente.setBounds(98, 73, 124, 23);
 					getContentPane().add(btnSiguiente);
 				}
 				
@@ -480,156 +394,249 @@ public class VistaAdminPlanes extends JPanel {
 					}
 					else in.setEnabled(true);
 				}
-				   
-				   
-				   private void modificarPlan (String nombreCarrera)
-				   {
-					  ConectorBD.obtenerConectorBD().conectarBD();
-				      try
-				      {
-				    	  // Creo un comando JDBC para realizar la inserción en la BD
-				    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-				    	  int cantInputs = inputsHabilitados();
-				    	  // Genero la sentencia de inserción
-				    	  String sql = "UPDATE planes SET ";
-				    	  // Si quiero modificar el DNI...
-				    	  if (inputs[0].isEnabled()) {
-				    		  sql += "nombre_carrera = \'" + inputs[0].getText() + "\'";
-				    		  cantInputs--;
-				    		  if (cantInputs > 0) {
-				    			  sql += ", ";
-				    		  }
-				    	  }
-				    	// Si quiero modificar el Nombre...
-				    	  if (inputs[1].isEnabled()) {
-				    		  sql += "version = " + inputs[1].getText() + " ";
-				    		  cantInputs--;
-				    	  }
-				    	  
-				    	  sql += " WHERE (nombre = " + nombreCarrera + ");";
-
-				         // Ejecuto la inserción del nuevo alumno
-				         stmt.executeUpdate(sql);
-				         JOptionPane.showMessageDialog(this,"Carrera con ID: " + nombreCarrera +" modificada exitosamente");
-				         stmt.close();
-				         dispose();	         
-				      }
-				      catch (SQLException ex)
-				      {
-				         // en caso de error, se muestra la causa en la consola
-				         System.out.println("SQLException: " + ex.getMessage());
-				         System.out.println("SQLState: " + ex.getSQLState());
-				         System.out.println("VendorError: " + ex.getErrorCode());
-				      }
-				      
-				      ConectorBD.obtenerConectorBD().desconectarBD();
-				      actualizarListaPlanes();
-				   }
-				   
-
-				   private int inputsHabilitados () {
-					   int cant = 0;
-					   int i;
-					   for (i=0; i < inputs.length; i++) {
-						   if (inputs[i].isEnabled()) {
-							   cant++;
-						   }
-					   }
-					   return cant;		
-				   }
+				
+				
+				private void modificarPlan (Plan plan) {
+					String [] in = {plan.obtenerId() + "", null, null};
+					// Verifico cuáles atributos se quieren editar y los incorporo a la entrada para modificar
+					if (inputVersion.isEnabled()) {
+						in[1] = inputVersion.getText();
+					}
+					// Procedo a la modificación
+					try
+					{
+						ControladorPlan.controlador().modificar(in);
+						JOptionPane.showMessageDialog(this,"Materia con ID: " + plan.obtenerId() +" modificada exitosamente");
+						actualizarTabla();
+					}
+					catch (DBUpdateException ex)
+					{
+						JOptionPane.showMessageDialog(this, ex.getMessage(), "Modificación de una materia", JOptionPane.ERROR_MESSAGE);
+					}
+					dispose();
+				}
 			}
 	}
 	
 	
 	
 	// CLASE PARA LA VENTANA DE INPUTS PARA LA BAJA
-	
-		public class VentanaElimPlan extends JFrame {
+
+	public class VentanaElimPlan extends JFrame {
+		
+		private static final long serialVersionUID = 1L;
+		private JTextField inputNombre;
+		private JButton btnSiguiente;
+		
+		
+		// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
+		
+		public VentanaElimPlan() {
+			super();
+			getContentPane().setLayout(null);
+	        setVisible(true);
+	        
+	        getContentPane().setBackground(SystemColor.controlHighlight);
+			setTitle("Baja de un plan");
+			setSize(new Dimension(374, 157));
+			setResizable(false);		
+			setLocationRelativeTo(null);
+				
+			// CREACIÓN DE INPUTS: registro de alumno
 			
-			private static final long serialVersionUID = 1L;
-			private JTextField inputNombre;
-			private JTextField inputNum;
-			private JButton btnSiguiente;
+			inputNombre = new JTextField();
+			inputNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputNombre.setBounds(145, 41, 148, 20);
+			getContentPane().add(inputNombre);
 			
+			// CREACIÓN DE LABELS: registro de alumno
 			
-			// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
+			JLabel lblId = new JLabel("ID del plan:");		
+			lblId.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			lblId.setBounds(63, 41, 72, 20);
+			getContentPane().add(lblId);
 			
-			public VentanaElimPlan() {
-				super();
-				getContentPane().setLayout(null);
-		        setVisible(true);
-		        
-		        getContentPane().setBackground(SystemColor.controlHighlight);
-				setTitle("Baja de una materia");
-				setSize(new Dimension(374, 197));
-				setResizable(false);		
-				setLocationRelativeTo(null);
-					
-				// CREACIÓN DE INPUTS: registro de alumno
-				
-				inputNombre = new JTextField();
-				inputNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-				inputNombre.setBounds(163, 41, 176, 20);
-				getContentPane().add(inputNombre);
-				
-				// CREACIÓN DE LABELS: registro de alumno
-				
-				JLabel lblId = new JLabel("Nombre de la carrera:");		
-				lblId.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-				lblId.setBounds(23, 41, 128, 20);
-				getContentPane().add(lblId);
-				
-				inputNum = new JTextField();
-				inputNum.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-				inputNum.setBounds(163, 72, 63, 20);
-				getContentPane().add(inputNum);
-				
-				JLabel lblNum = new JLabel("Version:");
-				lblNum.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-				lblNum.setBounds(82, 72, 69, 20);
-				getContentPane().add(lblNum);
-				
-				btnSiguiente = new JButton("Dar de baja");
-				btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
-				btnSiguiente.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {				
-						eliminarPlan();
-						dispose();
-					}
-				});
-				btnSiguiente.setBounds(124, 119, 124, 23);
-				getContentPane().add(btnSiguiente);
-				
-			}
+			btnSiguiente = new JButton("Dar de baja");
+			btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+			btnSiguiente.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {				
+					eliminarPlan();
+					dispose();
+				}
+			});
+			btnSiguiente.setBounds(119, 84, 124, 23);
+			getContentPane().add(btnSiguiente);
 			
-			
-			// CONEXIÓN Y DESCONEXIÓN DE LA BASE DE DATOS	   
-			   
-			   private void eliminarPlan ()
-			   {
-				  ConectorBD.obtenerConectorBD().conectarBD();
-			      try
-			      {
-			    	  // Creo un comando JDBC para realizar la inserción en la BD
-			    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-			    	  // Genero la sentencia de inserción
-			    	  String sql = "DELETE FROM planes WHERE (nombre_carrera = \'" + inputNombre.getText() +
-			    			  	   "\' and version = " + inputNum.getText() + ")";
-			    	  // Ejecuto la eliminación del alumno
-			    	  stmt.executeUpdate(sql);
-			    	  JOptionPane.showMessageDialog(this,"Plan dado de baja exitosamente");
-			    	  stmt.close();
-			    	  dispose();		         
-			      }
-			      catch (SQLException ex)
-			      {
-			         // en caso de error, se muestra la causa en la consola
-			         System.out.println("SQLException: " + ex.getMessage());
-			         System.out.println("SQLState: " + ex.getSQLState());
-			         System.out.println("VendorError: " + ex.getErrorCode());
-			      }		      
-			      ConectorBD.obtenerConectorBD().desconectarBD();
-			      actualizarListaPlanes();
-			   }
 		}
+		
+		
+		// CONEXIÓN Y DESCONEXIÓN DE LA BASE DE DATOS
+		
+		private void eliminarPlan () {
+			try
+			{
+				ControladorPlan.controlador().eliminar(inputNombre.getText());
+				JOptionPane.showMessageDialog(this,"Plan dado de baja exitosamente");
+				actualizarTabla();
+			}
+			catch (DBUpdateException ex)
+			{
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Baja de un plan", JOptionPane.ERROR_MESSAGE);
+			}
+			dispose();
+		}
+	}
+	
+		
+	private class VentanaAgregarCor extends JFrame {
+		
+		private static final long serialVersionUID = 1L;
+		private JTextField inputPlan;
+		private JTextField inputMat;
+		private JTextField inputCor;		
+		
+		public VentanaAgregarCor() {
+			setTitle("Registro de correlatividad");
+			getContentPane().setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			setSize(360,232);
+			getContentPane().setLayout(null);
+			setVisible(true);
+			setLocationRelativeTo(null);
+			setResizable(false);
+			
+			inputPlan = new JTextField();
+			inputPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputPlan.setBounds(147, 29, 160, 20);
+			getContentPane().add(inputPlan);
+			inputPlan.setColumns(10);
+			
+			inputMat = new JTextField();
+			inputMat.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputMat.setColumns(10);
+			inputMat.setBounds(147, 70, 160, 20);
+			getContentPane().add(inputMat);
+			
+			inputCor = new JTextField();
+			inputCor.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputCor.setColumns(10);
+			inputCor.setBounds(147, 111, 160, 20);
+			getContentPane().add(inputCor);
+			
+			JLabel lblIdPlan = new JLabel("ID del plan:");
+			lblIdPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			lblIdPlan.setBounds(65, 32, 72, 14);
+			getContentPane().add(lblIdPlan);
+			
+			JLabel lblIdMateria = new JLabel("ID de materia:");
+			lblIdMateria.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			lblIdMateria.setBounds(51, 70, 89, 20);
+			getContentPane().add(lblIdMateria);
+			
+			JLabel lblIdCorrelativa = new JLabel("ID de correlativa:");
+			lblIdCorrelativa.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			lblIdCorrelativa.setBounds(34, 111, 103, 20);
+			getContentPane().add(lblIdCorrelativa);
+			
+			JButton btnNewButton = new JButton("Guardar correlativa");
+			btnNewButton.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+			JFrame miVista = this;
+			btnNewButton.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					String [] inputs = {inputPlan.getText(), inputMat.getText(), inputCor.getText()};
+					try
+					{
+						Integer.parseInt(inputPlan.getText());
+						Integer.parseInt(inputMat.getText());
+						Integer.parseInt(inputCor.getText());
+						ControladorMateria.controlador().agregarCorrelatividad(inputs);
+						JOptionPane.showMessageDialog(miVista, "El registro de la correlatividad sobre el plan " + inputPlan.getText() +
+								", de la materia con ID: " + inputMat.getText() + " con su correlativa con ID: " + inputCor.getText());
+					}
+					catch (DBUpdateException ex) 
+					{
+						JOptionPane.showMessageDialog(miVista, ex.getMessage(), "Registro de correlatividad", JOptionPane.ERROR_MESSAGE);
+					}
+					catch (NumberFormatException ex) 
+					{
+						JOptionPane.showMessageDialog(miVista,
+								"¡ERROR! El ID del plan, así como el de las materias a vincular, debe ser un entero positivo",
+								"Registro de correlatividad", JOptionPane.ERROR_MESSAGE);
+					}
+					dispose();
+				}
+			});
+			btnNewButton.setBounds(102, 159, 149, 27);
+			getContentPane().add(btnNewButton);
+		}
+	}
+	
+		
+	public class VentanaAgregarMat extends JFrame {
+		
+		private static final long serialVersionUID = 1L;
+		private JTextField inputPlan;
+		private JTextField inputMat;
+		
+		
+		public VentanaAgregarMat() {
+			setTitle("Agregaci\u00F3n de materia a plan");
+			getContentPane().setLayout(null);
+			this.setVisible(true);
+			setSize(360,200);
+			setResizable(false);
+			setLocationRelativeTo(null);
+			JFrame miVista = this;
+			
+			JLabel lblPlan = new JLabel("ID del plan:");
+			lblPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			lblPlan.setBounds(60, 40, 72, 14);
+			getContentPane().add(lblPlan);
+			
+			JLabel lblMateria = new JLabel("ID de materia:");
+			lblMateria.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			lblMateria.setBounds(46, 78, 89, 20);
+			getContentPane().add(lblMateria);
+			
+			inputPlan = new JTextField();
+			inputPlan.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputPlan.setColumns(10);
+			inputPlan.setBounds(142, 37, 160, 20);
+			getContentPane().add(inputPlan);
+			
+			inputMat = new JTextField();
+			inputMat.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputMat.setColumns(10);
+			inputMat.setBounds(142, 78, 160, 20);
+			getContentPane().add(inputMat);
+			
+			JButton btnGuardar = new JButton("Guardar materia");
+			btnGuardar.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					String [] inputs = {inputPlan.getText(), inputMat.getText()};
+					try
+					{
+						Integer.parseInt(inputPlan.getText());
+						Integer.parseInt(inputMat.getText());					
+						ControladorPlan.controlador().agregarMateriaAPlan(inputs);
+					}
+					catch (DBUpdateException ex) 
+					{
+						JOptionPane.showMessageDialog(miVista, ex.getMessage(), "Registro de correlatividad", JOptionPane.ERROR_MESSAGE);
+					}
+					catch (NumberFormatException ex) 
+					{
+						JOptionPane.showMessageDialog(miVista,
+								"¡ERROR! El ID del plan, así como el de las materias a vincular, debe ser un entero positivo",
+								"Registro de asociación de materia con plan", JOptionPane.ERROR_MESSAGE);
+					}
+					dispose();
+				}
+			});
+			btnGuardar.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+			btnGuardar.setBounds(102, 125, 149, 27);
+			getContentPane().add(btnGuardar);
+		}
+	}	
+	
+	
 }

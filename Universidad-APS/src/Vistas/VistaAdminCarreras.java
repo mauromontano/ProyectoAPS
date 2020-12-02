@@ -2,7 +2,6 @@ package Vistas;
 
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -10,15 +9,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import java.awt.event.ActionListener;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
-import Conector.ConectorBD;
+import Controladores.ControladorCarrera;
 import Controladores.ControladorVistas;
+import Excepciones.DBRetrieveException;
+import Excepciones.DBUpdateException;
+import Modelos.Carrera;
 import quick.dbtable.DBTable;
 
 public class VistaAdminCarreras extends JPanel {
@@ -64,7 +63,7 @@ public class VistaAdminCarreras extends JPanel {
 		this.add(btnRegCarrera);
 		
 		tabla = new DBTable();
-		tabla.setBounds(460, 5, 248, 427);
+		tabla.setBounds(396, 5, 377, 427);
         
         panelTabla.setLayout(null);
         
@@ -102,36 +101,22 @@ public class VistaAdminCarreras extends JPanel {
         btnAtras.setBounds(10, 11, 70, 23);
         add(btnAtras);
               
-        actualizarListaCarreras();
+        actualizarTabla();
 	}
 	
 	/**
-	 * actualizarListaCarreras: permite actualizar el contenido de la db table para carreras,
+	 * actualizarTabla: permite actualizar el contenido de la db table para carreras,
 	   con todas las carreras registradas y sus datos.
 	 */
-	private void actualizarListaCarreras () {
-		ConectorBD.obtenerConectorBD().conectarBD(tabla);
+	private void actualizarTabla () {
 		try
 	    {
-			String consultaCarreras = "SELECT * FROM carreras ";
-			tabla.setSelectSql(consultaCarreras.trim());
-			// Obtengo el modelo de la DB Table para actualizar el contenido de la lista de alumnos
-	    	tabla.createColumnModelFromQuery();
-	    	// actualizamos el contenido de la tabla.   	     	  
-	    	tabla.refresh();
+			ControladorCarrera.controlador().volcar(tabla);
 	    }		
-		catch (SQLException ex)
+		catch (DBRetrieveException ex)
 		{
-	         // en caso de error, se muestra la causa en la consola
-	         System.out.println("SQLException: " + ex.getMessage());
-	         System.out.println("SQLState: " + ex.getSQLState());
-	         System.out.println("VendorError: " + ex.getErrorCode());
-	         JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
-	        		 					   ex.getMessage() + "\n",
-	        		 					   "ERROR! No se pudo cargar la lista de carreras",
-	                                       JOptionPane.ERROR_MESSAGE);
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Registro de una carrera", JOptionPane.ERROR_MESSAGE);
 	    }
-		ConectorBD.obtenerConectorBD().desconectarBD(tabla);
 	}
 	
 	
@@ -198,37 +183,22 @@ public class VistaAdminCarreras extends JPanel {
 		/**
 		 * registrarCarrera: solicita el registro de una nueva carrera en el sistema
 		 */
-		private void registrarCarrera ()
-		   {
-			   ConectorBD.obtenerConectorBD().conectarBD();
-			   try
-			   {
-		         // Creo un comando JDBC para realizar la inserción en la BD
-		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		         	         
-		         // Genero la sentencia de inserción	         
-		         String sql = "INSERT INTO carreras (nombre, duracion) VALUES (" + 
-		        		 	  "\'" + inputNombre.getText() +
-		        		 	  "\'," + inputDuracion.getText() + ");";
-
-		         // Ejecuto la inserción del nuevo alumno
-		         stmt.executeUpdate(sql);
-		         // Notifico éxito en la operación
-		         JOptionPane.showMessageDialog(this,"Carrera registrada exitosamente");	         
-		         stmt.close();
-		         dispose();
-		         
-		      }
-		      catch (SQLException ex)
-		      {
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
-		      }
-			  ConectorBD.obtenerConectorBD().desconectarBD();
-		      actualizarListaCarreras();
-		   }
+		private void registrarCarrera () {
+			String [] inputs = {inputNombre.getText(), inputDuracion.getText()};
+			try
+			{
+				ControladorCarrera.controlador().registrar(inputs);
+				// Notifico éxito en la operación
+				JOptionPane.showMessageDialog(this,"Carrera registrada exitosamente");
+				dispose();
+			}
+			catch (DBUpdateException ex)
+			{
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Registro de una carrera", JOptionPane.ERROR_MESSAGE);
+			}
+			actualizarTabla();
+		}
+		
 	}
 	
 	
@@ -285,37 +255,26 @@ public class VistaAdminCarreras extends JPanel {
 		   
 		   private void abrirEdicionCarrera ()
 		   {
-			  ConectorBD.obtenerConectorBD().conectarBD();
+			  String [] inputs = {inputId.getText(), null, null};
+			  Carrera carrera = null;
 		      try
 		      {
-		         // Creo un comando JDBC para realizar la inserción en la BD
-		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		         // Genero la sentencia de inserción	         
-		         String sql = "SELECT * FROM carreras WHERE (id = " + inputId.getText() + ")";
-
-		         // Ejecuto la eliminación del alumno
-		         ResultSet rs = stmt.executeQuery(sql);
-		         if (!rs.next()) {
+		    	
+		         carrera = ControladorCarrera.controlador().recuperar(inputs);
+		         if (carrera == null) {
 		        	 JOptionPane.showMessageDialog(this,
 		        			 "ERROR! No existe una carrera registrada con ID: " + inputId.getText(),
 		        			 "Modificación de una carrera", JOptionPane.ERROR_MESSAGE);
 		         }
 		         else {
-		        	 new VentanaEdicionCarrera(Integer.parseInt(inputId.getText()));			        	 
-		         }
-		         stmt.close();
-		         dispose();	         
+		        	 new VentanaEdicionCarrera(carrera);			        	 
+		         }		         	         
 		      }
-		      catch (SQLException ex)
+		      catch (DBRetrieveException ex)
 		      {
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
+		    	  JOptionPane.showMessageDialog(this, ex.getMessage(), "Modificación de una carrera", JOptionPane.ERROR_MESSAGE);
 		      }
-		      
-		      ConectorBD.obtenerConectorBD().desconectarBD();
-		      actualizarListaCarreras();
+		      dispose();
 		   }
 		   
 		   
@@ -329,7 +288,7 @@ public class VistaAdminCarreras extends JPanel {
 				
 				// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
 				
-				public VentanaEdicionCarrera(int id) {
+				public VentanaEdicionCarrera (Carrera carrera) {
 					super();
 					getContentPane().setEnabled(false);
 					getContentPane().setLayout(null);
@@ -403,7 +362,7 @@ public class VistaAdminCarreras extends JPanel {
 					btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 					btnSiguiente.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {				
-							modificarCarrera(id);
+							modificarCarrera(carrera);
 							dispose();
 						}
 					});
@@ -418,63 +377,31 @@ public class VistaAdminCarreras extends JPanel {
 					}
 					else in.setEnabled(true);
 				}
-				   
-				   
-				   private void modificarCarrera (int id)
-				   {
-					  ConectorBD.obtenerConectorBD().conectarBD();
-				      try
-				      {
-				    	  // Creo un comando JDBC para realizar la inserción en la BD
-				    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-				    	  int cantInputs = inputsHabilitados();
-				    	  // Genero la sentencia de inserción
-				    	  String sql = "UPDATE carreras SET ";
-				    	  // Si quiero modificar el DNI...
-				    	  if (inputs[0].isEnabled()) {
-				    		  sql += "nombre = \'" + inputs[0].getText() + "\'";
-				    		  cantInputs--;
-				    		  if (cantInputs > 0) {
-				    			  sql += ", ";
-				    		  }
-				    	  }
-				    	// Si quiero modificar el Nombre...
-				    	  if (inputs[1].isEnabled()) {
-				    		  sql += "duracion = " + inputs[1].getText() + " ";
-				    		  cantInputs--;
-				    	  }
-				    	  
-				    	  sql += " WHERE (id = " + id + ");";
-
-				         // Ejecuto la inserción del nuevo alumno
-				         stmt.executeUpdate(sql);
-				         JOptionPane.showMessageDialog(this,"Carrera con ID: " + id +" modificada exitosamente");
-				         stmt.close();
-				         dispose();	         
-				      }
-				      catch (SQLException ex)
-				      {
-				         // en caso de error, se muestra la causa en la consola
-				         System.out.println("SQLException: " + ex.getMessage());
-				         System.out.println("SQLState: " + ex.getSQLState());
-				         System.out.println("VendorError: " + ex.getErrorCode());
-				      }
-				      
-				      ConectorBD.obtenerConectorBD().desconectarBD();
-				      actualizarListaCarreras();
-				   }
-				   
-
-				   private int inputsHabilitados () {
-					   int cant = 0;
-					   int i;
-					   for (i=0; i < inputs.length; i++) {
-						   if (inputs[i].isEnabled()) {
-							   cant++;
-						   }
-					   }
-					   return cant;		
-				   }
+			
+				
+				private void modificarCarrera (Carrera carrera) {
+					String [] in = {carrera.obtenerId() + "", null, null};
+					// Verifico cuáles atributos se quieren editar y los incorporo a la entrada para modificar
+					if (inputs[0].isEnabled()) {
+						in[1] = inputs[0].getText();
+					}
+					if (inputs[1].isEnabled()) {
+						in[2] = inputs[1].getText();
+					}
+					// Procedo a la modificación
+					try
+					{
+						ControladorCarrera.controlador().modificar(in);
+						JOptionPane.showMessageDialog(this,"Carrera con ID: " + carrera.obtenerId() +" modificada exitosamente");
+						actualizarTabla();
+					}
+					catch (DBUpdateException ex)
+					{
+						JOptionPane.showMessageDialog(this, ex.getMessage(), "Modificación de una carrera", JOptionPane.ERROR_MESSAGE);
+					}
+					dispose();
+				}
+				
 			}		   
 	}
 	
@@ -485,13 +412,13 @@ public class VistaAdminCarreras extends JPanel {
 	public class VentanaElimCarrera extends JFrame {
 		
 		private static final long serialVersionUID = 1L;
-		private JTextField inputNombre;
+		private JTextField inputId;
 		private JButton btnSiguiente;
 		
 		
 		// CONSTRUCTOR: Ventana para el registro de un nuevo alumno
 		
-		public VentanaElimCarrera() {
+		public VentanaElimCarrera () {
 			super();
 			getContentPane().setLayout(null);
 	        setVisible(true);
@@ -504,14 +431,14 @@ public class VistaAdminCarreras extends JPanel {
 				
 			// CREACIÓN DE INPUTS: registro de alumno
 			
-			inputNombre = new JTextField();
-			inputNombre.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
-			inputNombre.setBounds(163, 41, 176, 20);
-			getContentPane().add(inputNombre);
+			inputId = new JTextField();
+			inputId.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
+			inputId.setBounds(163, 41, 176, 20);
+			getContentPane().add(inputId);
 			
 			// CREACIÓN DE LABELS: registro de alumno
 			
-			JLabel lblId = new JLabel("Nombre de la carrera:");		
+			JLabel lblId = new JLabel("ID de carrera:");		
 			lblId.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 12));
 			lblId.setBounds(23, 41, 128, 20);
 			getContentPane().add(lblId);
@@ -529,34 +456,21 @@ public class VistaAdminCarreras extends JPanel {
 			
 		}
 		
+				
+		private void eliminarCarrera () {
+			try
+			{
+				ControladorCarrera.controlador().eliminar(inputId.getText());
+				JOptionPane.showMessageDialog(this,"Carrera dada de baja exitosamente");
+				dispose();
+			}
+			catch (DBUpdateException ex)
+			{
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Baja de una carrera", JOptionPane.ERROR_MESSAGE);
+			}
+			actualizarTabla();
+		}
 		
-		// CONEXIÓN Y DESCONEXIÓN DE LA BASE DE DATOS	   
-		   
-		   private void eliminarCarrera ()
-		   {
-			  ConectorBD.obtenerConectorBD().conectarBD();
-		      try
-		      {
-		    	  // Creo un comando JDBC para realizar la inserción en la BD
-		    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		    	  // Genero la sentencia de inserción
-		    	  String sql = "DELETE FROM carreras WHERE (nombre = \'" + inputNombre.getText() + "\')";
-		    	  // Ejecuto la eliminación del alumno
-		    	  stmt.executeUpdate(sql);
-		    	  JOptionPane.showMessageDialog(this,"Carrera dada de baja exitosamente");
-		    	  stmt.close();
-		    	  dispose();		         
-		      }
-		      catch (SQLException ex)
-		      {
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
-		      }		      
-		      ConectorBD.obtenerConectorBD().desconectarBD();
-		      actualizarListaCarreras();
-		   }
 	}
 
 }

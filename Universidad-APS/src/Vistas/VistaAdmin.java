@@ -42,7 +42,7 @@ public class VistaAdmin extends JPanel {
 				
 		this.setBorder(new LineBorder(SystemColor.activeCaptionBorder));
 		this.setBackground(SystemColor.menu);
-		this.setBounds(420, 239, 368, 240);
+		this.setBounds(420, 165, 368, 320);
 		this.setLayout(null);
 		
 		JButton btnSecAlumnos = new JButton("Alumnos");
@@ -58,7 +58,7 @@ public class VistaAdmin extends JPanel {
 		
 		JButton btnSecCarreras = new JButton("Carreras");
 		btnSecCarreras.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 14));
-		btnSecCarreras.setBounds(102, 85, 160, 31);
+		btnSecCarreras.setBounds(102, 127, 160, 31);
 		btnSecCarreras.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Swap a la vista de administración de carreras
@@ -69,7 +69,7 @@ public class VistaAdmin extends JPanel {
 		
 		JButton btnSecMaterias = new JButton("Materias");
 		btnSecMaterias.setFont(new Font("Microsoft YaHei Light", Font.PLAIN, 14));
-		btnSecMaterias.setBounds(102, 169, 160, 31);
+		btnSecMaterias.setBounds(102, 211, 160, 31);
 		btnSecMaterias.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Swap a la vista de administración de materias
@@ -80,7 +80,7 @@ public class VistaAdmin extends JPanel {
 		
 		JButton btnSecPlanes = new JButton("Planes");
 		btnSecPlanes.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 14));
-		btnSecPlanes.setBounds(102, 127, 160, 31);
+		btnSecPlanes.setBounds(102, 169, 160, 31);
 		btnSecPlanes.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// Swap a la vista de administración de planes
@@ -89,8 +89,25 @@ public class VistaAdmin extends JPanel {
 		});
 		this.add(btnSecPlanes);
 		
+		JButton btnSecProfes = new JButton("Profesores");
+		btnSecProfes.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ControladorVistas.controlador().mostrar(VistaAdminProfesores.vista());
+			}
+		});
+		btnSecProfes.setFont(new Font("Microsoft YaHei Light", Font.PLAIN, 14));
+		btnSecProfes.setBounds(102, 85, 160, 31);
+		add(btnSecProfes);
+		
+		JButton btnSecDictados = new JButton("Dictados");
+		btnSecDictados.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				ControladorVistas.controlador().mostrar(VistaAdminDictados.vista());
+			}
+		});
+		btnSecDictados.setFont(new Font("Microsoft YaHei Light", Font.PLAIN, 14));
+		btnSecDictados.setBounds(102, 253, 160, 31);
+		add(btnSecDictados);
+		
 	}
-	
-	
-
 }

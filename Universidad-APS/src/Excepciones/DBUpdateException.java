@@ -1,6 +1,6 @@
 package Excepciones;
 
-public class ExcepcionEliminacion extends Exception {
+public class DBUpdateException extends Exception {
 	
 	private static final long serialVersionUID = 1L;
 
@@ -8,7 +8,7 @@ public class ExcepcionEliminacion extends Exception {
 	 * ExcepcionLexica: constructor.
 	 * @param msg: mensaje de reporte para la excepción.
 	 */
-	public ExcepcionEliminacion (String msg) {
+	public DBUpdateException (String msg) {
 		super(msg);
 	}	
 

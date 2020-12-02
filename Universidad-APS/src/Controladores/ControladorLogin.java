@@ -2,9 +2,8 @@ package Controladores;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
-import Conector.ConectorBD;
-import Excepciones.ExcepcionAutenticacion;
+import Conector.DriverBD;
+import Excepciones.AuthException;
 import Modelos.Alumno;
 import Modelos.Profesor;
 import Vistas.VistaAdmin;
@@ -33,14 +32,12 @@ public class ControladorLogin {
 	 * @param ps: arreglo de chars asociado a la contraseña del usuario que desea acceder a su home.
 	 * @throws ExcepcionAutenticacion: cuando los datos ingresados para la autenticación son inválidos.
 	 */
-	public void login (String cat, String us, char [] ps) throws ExcepcionAutenticacion {
+	public void login (String cat, String us, char [] ps) throws AuthException {
 		String pswd = new String(ps);
 		boolean formatoInvalido = false;
 		// Si el usuario es administrador, accedo a su correspondiente vista
-		if (cat.contentEquals("Administrador")) {
-			ControladorVistas.controlador().mostrar(VistaAdmin.vista());
-			/*
-			if (us.contentEquals("admin_uni") && pswd.contentEquals("pwadmin")) {
+		if (cat.contentEquals("Administrador")) {			
+			if (us.contentEquals("admin") && pswd.contentEquals("pwadmin")) {
 				// Solicito al controlador de vistas el swap a la vista home de administrador
 				ControladorVistas.controlador().mostrar(VistaAdmin.vista());
 			}
@@ -48,42 +45,39 @@ public class ControladorLogin {
 			{
 				formatoInvalido = true;
 			}
-			*/
-		}
-		
+		}		
 		// El usuario no es de tipo administrador, debo confirmar la autenticación con datos de la BD
 		else {
-			ConectorBD.obtenerConectorBD().conectarBD();
 			try 
 			{
 				// Creo un comando JDBC para realizar una consulta en la BD
-				String consultaSQL;
-				Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-				consultaSQL = "SELECT * FROM ";
+				String sentenciaSQL = "SELECT * FROM ";
 				// Determino el tipo de categoría para saber en qué tabla de la BD debo corroborar las consultas
-				if (cat.contentEquals("Alumno")) 
-				{
-					consultaSQL += "alumnos WHERE (LU = " + us + " AND dni = " + pswd + ");";
+				if (cat.contentEquals("Alumno")) {
 					Alumno alumno;
-					ResultSet rs = stmt.executeQuery(consultaSQL);
+					sentenciaSQL += "alumnos WHERE (LU = " + us + " AND dni = " + pswd + ");";
+					DriverBD.driver().nuevaConexion();
+					ResultSet rs = DriverBD.driver().consultar(sentenciaSQL);
 					if (rs.next()) {
-						alumno = Alumno.siguienteModelo(rs);
+						alumno = Alumno.extraerModelo(rs);
 						VistaAlumno.vista().generarVistaAlumno(alumno);
-						// Solicito al controlador de vistas el swap a la vista home de alumno
 						ControladorVistas.controlador().mostrar(VistaAlumno.vista());
 					}
 					else 
 					{
 						formatoInvalido = true;
 					}
+					DriverBD.driver().cerrarConexion();
 				}
 				else 
 				{
-					consultaSQL += "profesores WHERE (dni = " + us + " AND matricula = " + pswd + ");";
-					ResultSet rs = stmt.executeQuery(consultaSQL);
+					Profesor profesor;
+					sentenciaSQL += "profesores WHERE (dni = " + us + " AND matricula = " + pswd + ");";					
+					DriverBD.driver().nuevaConexion();
+					ResultSet rs = DriverBD.driver().consultar(sentenciaSQL);
 					if (rs.next()) {
-						Profesor profesor = Profesor.siguienteModelo(rs);
-						VistaProfesor.vista().generarVistaProfesor(profesor);
+						profesor = Profesor.extraerModelo(rs);
+						VistaProfesor.vista().generarHomeProfesor(profesor);
 						// Activo la vista correspondiente y desactivo la actual
 						ControladorVistas.controlador().mostrar(VistaProfesor.vista());
 					}
@@ -91,19 +85,17 @@ public class ControladorLogin {
 					{
 						formatoInvalido = true;
 					}
-				}				
-				stmt.close();
+					DriverBD.driver().cerrarConexion();
+				}
 			}
 			catch (SQLException ex)
 			{
 				formatoInvalido = true;
 			}
-			
-			ConectorBD.obtenerConectorBD().desconectarBD();
-			
-			if (formatoInvalido) {
-				throw new ExcepcionAutenticacion("Acceso fallido: usuario o contraseña especificados son incorrectos.");
-			}
+		}
+		
+		if (formatoInvalido) {
+			throw new AuthException("Acceso fallido: usuario o contraseña especificados son incorrectos.");
 		}
 	}
 

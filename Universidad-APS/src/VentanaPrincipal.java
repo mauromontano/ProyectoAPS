@@ -14,13 +14,13 @@ public class VentanaPrincipal extends JFrame {
 	// MÉTODO PRINCIPAL
 	
 	public static void main(String[] args) {
-	      SwingUtilities.invokeLater(new Runnable() {
-	         public void run() {
-	            VentanaPrincipal inst = new VentanaPrincipal();
-	            inst.setLocationRelativeTo(null);
-	            inst.setVisible(true);
-	         }
-	      });
+		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				VentanaPrincipal inst = new VentanaPrincipal();
+				inst.setLocationRelativeTo(null);
+				inst.setVisible(true);
+			}
+		});
 	}
 	
 	
@@ -29,7 +29,7 @@ public class VentanaPrincipal extends JFrame {
 	public VentanaPrincipal() {		
 		super();
 		getContentPane().setBackground(SystemColor.controlHighlight);
-		setTitle("Universidad - APS");
+		setTitle("APS | Universidad");
 		getContentPane().setMinimumSize(new Dimension(1200, 728));
 		setMinimumSize(new Dimension(1200, 728));
 		setResizable(false);		
@@ -40,20 +40,26 @@ public class VentanaPrincipal extends JFrame {
 		getContentPane().add(VistaInicio.vista());
 		getContentPane().add(VistaAlumno.vista());
 		getContentPane().add(VistaProfesor.vista());
+		getContentPane().add(VistaDictados.vista());
 		getContentPane().add(VistaAdmin.vista());
 		getContentPane().add(VistaAdminAlumnos.vista());
+		getContentPane().add(VistaAdminProfesores.vista());
 		getContentPane().add(VistaAdminCarreras.vista());
-		getContentPane().add(VistaAdminMaterias.vista());
 		getContentPane().add(VistaAdminPlanes.vista());
+		getContentPane().add(VistaAdminMaterias.vista());
+		getContentPane().add(VistaAdminDictados.vista());
 		
 		ControladorVistas.controlador();
 		VistaAlumno.vista().setVisible(false);
 		VistaProfesor.vista().setVisible(false);
+		VistaDictados.vista().setVisible(false);
 		VistaAdmin.vista().setVisible(false);
 		VistaAdminAlumnos.vista().setVisible(false);
+		VistaAdminProfesores.vista().setVisible(false);
 		VistaAdminCarreras.vista().setVisible(false);
+		VistaAdminPlanes.vista().setVisible(false);
 		VistaAdminMaterias.vista().setVisible(false);
-		VistaAdminPlanes.vista().setVisible(false);				
+		VistaAdminDictados.vista().setVisible(false);
 		
 	}
 	

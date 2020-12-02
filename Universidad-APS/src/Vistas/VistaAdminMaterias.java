@@ -1,11 +1,11 @@
 package Vistas;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
-
-import Conector.ConectorBD;
+import Controladores.ControladorMateria;
 import Controladores.ControladorVistas;
-
+import Excepciones.DBRetrieveException;
+import Excepciones.DBUpdateException;
+import Modelos.Materia;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComponent;
@@ -17,9 +17,6 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.SystemColor;
@@ -115,9 +112,7 @@ public class VistaAdminMaterias extends JPanel {
         btnAtras.setBounds(10, 11, 70, 23);
         add(btnAtras);
         
-        this.conectarBD();        
-        actualizarListaMaterias();
-        this.desconectarBD();
+        actualizarTabla();
 	}
 	
 	
@@ -144,78 +139,16 @@ public class VistaAdminMaterias extends JPanel {
 	}
 	
 	
-	private void conectarBD() {
-	         try
-	         {
-	            String driver ="com.mysql.cj.jdbc.Driver";
-	        	String servidor = "localhost:3306";
-	        	String baseDatos = "universidad"; 
-	        	String usuario = "admin_uni";
-	        	String clave = "pwadmin";
-	            String uriConexion = "jdbc:mysql://" + servidor + "/" + 
-	        	                     baseDatos +"?serverTimezone=America/Argentina/Buenos_Aires";
-	   
-	            tabla.connectDatabase(driver, uriConexion, usuario, clave);
-	           
-	         }
-	         catch (SQLException ex)
-	         {
-	            JOptionPane.showMessageDialog(this,
-	                           "Se produjo un error al intentar conectarse a la base de datos.\n" 
-	                            + ex.getMessage(),
-	                            "Error",
-	                            JOptionPane.ERROR_MESSAGE);
-	            System.out.println("SQLException: " + ex.getMessage());
-	            System.out.println("SQLState: " + ex.getSQLState());
-	            System.out.println("VendorError: " + ex.getErrorCode());
-	         }
-	         catch (ClassNotFoundException e)
-	         {
-	            e.printStackTrace();
-	         }
-	      
-	   }
-
-	   private void desconectarBD()
-	   {
-		   try
-		   {
-			   tabla.close();            
-	       }
-	       catch (SQLException ex)
-	       {
-	    	   System.out.println("SQLException: " + ex.getMessage());
-	           System.out.println("SQLState: " + ex.getSQLState());
-	           System.out.println("VendorError: " + ex.getErrorCode());
-	       }      
-	   }
-
-	
-	   private void actualizarListaMaterias () {
-			ConectorBD.obtenerConectorBD().conectarBD(tabla);
-			try
-		    {
-				String consultaMaterias = "SELECT * FROM materias ";
-				tabla.setSelectSql(consultaMaterias.trim());
-				// Obtengo el modelo de la DB Table para actualizar el contenido de la lista
-		    	tabla.createColumnModelFromQuery();
-		    	// Actualizo el contenido de la tabla   	     	  
-		    	tabla.refresh();
-		    }
-			
-			catch (SQLException ex)
-			{
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
-		         JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
-		        		 					   ex.getMessage() + "\n",
-		        		 					   "ERROR! No se pudo cargar la lista de materias",
-		                                       JOptionPane.ERROR_MESSAGE);
-		    }
-			ConectorBD.obtenerConectorBD().desconectarBD(tabla);
-		}
+	private void actualizarTabla () {
+		try
+	    {
+			ControladorMateria.controlador().volcar(tabla);
+	    }		
+		catch (DBRetrieveException ex)
+		{
+			JOptionPane.showMessageDialog(this, ex.getMessage(), "Volcado de datos de materias", JOptionPane.ERROR_MESSAGE);
+	    }
+	}
 	
 	
 	// CLASE PARA LA VENTANA DE INPUTS PARA EL REGISTRO
@@ -267,9 +200,7 @@ public class VistaAdminMaterias extends JPanel {
 			btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 			btnSiguiente.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					conectarBD();
 					registrarMateria();
-					desconectarBD();
 					dispose();
 				}
 			});
@@ -280,33 +211,20 @@ public class VistaAdminMaterias extends JPanel {
 
 		   
 
-		private void registrarMateria ()
-		{
-			ConectorBD.obtenerConectorBD().conectarBD();
+		private void registrarMateria () {
+			String [] inputs = {inputNombre.getText(), inputCarga.getText()};
 			try
 			{
-				// Creo un comando JDBC para realizar la inserción en la BD
-				Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		        // Genero la sentencia de inserción
-		        String sql = "INSERT INTO materias (nombre, carga_horaria) VALUES (" + 
-		        		 	  "\'" + inputNombre.getText() +
-		        		 	  "\'," + inputCarga.getText() + ");";
-		        // Ejecuto la inserción de la nueva materia
-		        stmt.executeUpdate(sql);
-		        // Notifico éxito en la operación
-		        JOptionPane.showMessageDialog(this,"Materia registrada exitosamente");
-		        stmt.close();
-		        dispose();
-		    }
-			catch (SQLException ex)
-			{
-				// en caso de error, se muestra la causa en la consola
-				System.out.println("SQLException: " + ex.getMessage());
-				System.out.println("SQLState: " + ex.getSQLState());
-				System.out.println("VendorError: " + ex.getErrorCode());
+				ControladorMateria.controlador().registrar(inputs);
+				// Notifico éxito en la operación
+				JOptionPane.showMessageDialog(this,"Materia registrada exitosamente");
+				actualizarTabla();
+				dispose();
 			}
-			ConectorBD.obtenerConectorBD().desconectarBD();
-			actualizarListaMaterias();
+			catch (DBUpdateException ex)
+			{
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Registro de una materia", JOptionPane.ERROR_MESSAGE);
+			}			
 		}
 		
 	}
@@ -361,41 +279,28 @@ public class VistaAdminMaterias extends JPanel {
 			
 		}
 		
-		   
-		   private void abrirEdicionMateria()
-		   {
-			  ConectorBD.obtenerConectorBD().conectarBD();
-		      try
-		      {
-		         // Creo un comando JDBC para realizar la inserción en la BD
-		         Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		         // Genero la sentencia de inserción	         
-		         String sql = "SELECT * FROM materias WHERE (id = " + inputId.getText() + ")";
-
-		         // Ejecuto la eliminación de la materia
-		         ResultSet rs = stmt.executeQuery(sql);
-		         if (!rs.next()) {
-		        	 JOptionPane.showMessageDialog(this,
-		        			 "ERROR! No existe un materia registrada con ID: " + inputId.getText(),
-		        			 "Modificación de una materia", JOptionPane.ERROR_MESSAGE);
-		         }
-		         else {
-		        	 new VentanaEdicionMateria(Integer.parseInt(inputId.getText()));			        	 
-		         }
-		         stmt.close();
-		         dispose();	         
-		      }
-		      catch (SQLException ex)
-		      {
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
-		      }
-		      
-		      ConectorBD.obtenerConectorBD().desconectarBD();
-		      actualizarListaMaterias();  
-		   }
+		
+		private void abrirEdicionMateria() {
+			String [] inputs = {inputId.getText(), null, null};
+			Materia materia = null;
+			try
+			{
+				materia = ControladorMateria.controlador().recuperar(inputs);
+				if (materia == null) {
+					JOptionPane.showMessageDialog(this,
+							"ERROR! No existe una materia registrada con ID: " + inputId.getText(),
+							"Modificación de una materia", JOptionPane.ERROR_MESSAGE);
+				}
+				else {
+					new VentanaEdicionMateria(materia);
+				}
+			}
+			catch (DBRetrieveException ex)
+			{
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Modificación de una materia", JOptionPane.ERROR_MESSAGE);
+			}
+			dispose();
+		}
 		   
 		   
 		   private class VentanaEdicionMateria extends JFrame {
@@ -407,7 +312,7 @@ public class VistaAdminMaterias extends JPanel {
 				
 				// CONSTRUCTOR: Ventana para la modificación de una materia
 				
-				public VentanaEdicionMateria(int id) {
+				public VentanaEdicionMateria(Materia materia) {
 					super();
 					getContentPane().setEnabled(false);
 					getContentPane().setLayout(null);
@@ -482,7 +387,7 @@ public class VistaAdminMaterias extends JPanel {
 					btnSiguiente.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
 					btnSiguiente.addActionListener(new ActionListener() {
 						public void actionPerformed(ActionEvent e) {				
-							modificarMateria(id);
+							modificarMateria(materia);
 							dispose();
 						}
 					});
@@ -497,63 +402,31 @@ public class VistaAdminMaterias extends JPanel {
 					}
 					else in.setEnabled(true);
 				}
-				   
-				   
-				   private void modificarMateria (int id)
-				   {
-					  ConectorBD.obtenerConectorBD().conectarBD();
-				      try
-				      {
-				    	  // Creo un comando JDBC para realizar la inserción en la BD
-				    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-				    	  int cantInputs = inputsHabilitados();
-				    	  // Genero la sentencia de inserción
-				    	  String sql = "UPDATE materias SET ";
-				    	  // Si quiero modificar el DNI...
-				    	  if (inputs[0].isEnabled()) {
-				    		  sql += "nombre = \'" + inputs[0].getText() + "\'";
-				    		  cantInputs--;
-				    		  if (cantInputs > 0) {
-				    			  sql += ", ";
-				    		  }
-				    	  }
-				    	// Si quiero modificar el Nombre...
-				    	  if (inputs[1].isEnabled()) {
-				    		  sql += "carga_horaria = " + inputs[1].getText() + " ";
-				    		  cantInputs--;
-				    	  }
-				    	  
-				    	  sql += " WHERE (id = " + id + ");";
-
-				         // Ejecuto la inserción de una nueva materia
-				         stmt.executeUpdate(sql);
-				         JOptionPane.showMessageDialog(this,"Materia con ID: " + id +" modificada exitosamente");
-				         stmt.close();
-				         dispose();	         
-				      }
-				      catch (SQLException ex)
-				      {
-				         // en caso de error, se muestra la causa en la consola
-				         System.out.println("SQLException: " + ex.getMessage());
-				         System.out.println("SQLState: " + ex.getSQLState());
-				         System.out.println("VendorError: " + ex.getErrorCode());
-				      }
-				      
-				      ConectorBD.obtenerConectorBD().desconectarBD();
-				      actualizarListaMaterias();
-				   }
-				   
-
-				   private int inputsHabilitados () {
-					   int cant = 0;
-					   int i;
-					   for (i=0; i < inputs.length; i++) {
-						   if (inputs[i].isEnabled()) {
-							   cant++;
-						   }
-					   }
-					   return cant;		
-				   }
+				
+				
+				private void modificarMateria (Materia materia) {
+					String [] in = {materia.obtenerId() + "", null, null};
+					// Verifico cuáles atributos se quieren editar y los incorporo a la entrada para modificar
+					if (inputs[0].isEnabled()) {
+						in[1] = inputs[0].getText();
+					}
+					if (inputs[1].isEnabled()) {
+						in[2] = inputs[1].getText();
+					}
+					// Procedo a la modificación
+					try
+					{
+						ControladorMateria.controlador().modificar(in);
+						JOptionPane.showMessageDialog(this,"Materia con ID: " + materia.obtenerId() +" modificada exitosamente");
+						actualizarTabla();
+					}
+					catch (DBUpdateException ex)
+					{
+						JOptionPane.showMessageDialog(this, ex.getMessage(), "Modificación de una materia", JOptionPane.ERROR_MESSAGE);
+					}
+					dispose();
+				}
+				
 			}
 		   
 	}	
@@ -606,34 +479,22 @@ public class VistaAdminMaterias extends JPanel {
 			btnSiguiente.setBounds(79, 82, 124, 23);
 			getContentPane().add(btnSiguiente);
 			
-		}   
-		   
-		   private void eliminarMateria ()
-		   {
-			  ConectorBD.obtenerConectorBD().conectarBD();
-		      try
-		      {
-		    	  // Creo un comando JDBC para realizar la inserción en la BD
-		    	  Statement stmt = ConectorBD.obtenerConectorBD().nuevoStatement();
-		    	  // Genero la sentencia de inserción
-		    	  String sql = "DELETE FROM materias WHERE ( id = " + inputId.getText() + ")";
-		    	  // Ejecuto la eliminación de una materia
-		    	  stmt.executeUpdate(sql);
-		    	  JOptionPane.showMessageDialog(this,"Materia dada de baja exitosamente");
-		    	  stmt.close();
-		    	  dispose();		         
-		      }
-		      catch (SQLException ex)
-		      {
-		         // en caso de error, se muestra la causa en la consola
-		         System.out.println("SQLException: " + ex.getMessage());
-		         System.out.println("SQLState: " + ex.getSQLState());
-		         System.out.println("VendorError: " + ex.getErrorCode());
-		      }
-		      
-		      ConectorBD.obtenerConectorBD().desconectarBD();
-		      actualizarListaMaterias();
-		   }
+		}
+		
+		
+		private void eliminarMateria () {
+			try
+			{
+				ControladorMateria.controlador().eliminar(inputId.getText());
+				JOptionPane.showMessageDialog(this,"Materia dada de baja exitosamente");
+				actualizarTabla();
+			}
+			catch (DBUpdateException ex)
+			{
+				JOptionPane.showMessageDialog(this, ex.getMessage(), "Baja de una materia", JOptionPane.ERROR_MESSAGE);
+			}
+			dispose();
+		}
 		   
 	}
 

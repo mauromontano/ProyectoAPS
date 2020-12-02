@@ -3,7 +3,7 @@ package Modelos;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Alumno {
+public class Alumno implements Modelo {
 	
 	private int LU;
 	private int dni;
@@ -30,7 +30,7 @@ public class Alumno {
 	 * @param rs: colección de filas de alumnos.
 	 * @return primer modelo de alumno de la colección de filas del result set. 
 	 */
-	public static Alumno siguienteModelo (ResultSet rs) {		
+	public static Alumno extraerModelo (ResultSet rs) {		
 		int lu;
 		int d;
 		String nom;
@@ -90,6 +90,11 @@ public class Alumno {
 	 */
 	public String obtenerGenero () {
 		return new String(genero);
+	}
+	
+	
+	public String toString () {
+		return apellido.toUpperCase() + " " + nombre +  " [" + LU + "]";
 	}
 
 }

@@ -3,7 +3,7 @@ package Modelos;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Materia {
+public class Materia implements Modelo {
 	
 	private int id;
 	private String nombre;
@@ -28,7 +28,7 @@ public class Materia {
 	 * @param rs: colección de filas de alumnos.
 	 * @return primer modelo de alumno de la colección de filas del result set. 
 	 */
-	public static Materia siguienteModelo (ResultSet rs) {		
+	public static Materia extraerModelo (ResultSet rs) {		
 		int i;
 		String nom;
 		int c;

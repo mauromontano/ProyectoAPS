@@ -5,33 +5,32 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-
 import Conector.DriverBD;
 import Excepciones.DBRetrieveException;
 import Excepciones.DBUpdateException;
-import Modelos.Alumno;
+import Modelos.MesaDeExamen;
 import Modelos.Modelo;
 import quick.dbtable.DBTable;
 
-public class ControladorAlumno implements ControladorModelo {
+public class ControladorMesa implements ControladorModelo {
 	
-	private static ControladorAlumno instancia = null;
+private static ControladorMesa instancia = null;
 	
 	/**
 	 * controlador: retorna la instancia asociada al controlador
 	 * @return controlador asociado a alumnos
 	 */
-	public static ControladorAlumno controlador () {
+	public static ControladorMesa controlador () {
 		if (instancia == null) {
-			instancia = new ControladorAlumno();
+			instancia = new ControladorMesa();
 		}
 		return instancia;
 	}
 	
 	/**
-	 * registrar: permite el registro de un alumno en base a datos de entrada asociados a sus
+	 * registrar: permite el registro de una mesa de examen en base a datos de entrada asociados a sus
 	   atributos
-	 * @param inputs: arreglo de atributos del nuevo alumno a registrar
+	 * @param inputs: arreglo de atributos de la nueva mesa de examen a registrar
 	 */
 	public void registrar (String [] inputs) throws DBUpdateException {
 		String sentenciaSQL;
@@ -40,10 +39,10 @@ public class ControladorAlumno implements ControladorModelo {
 		try
 		{
 			// Genero la sentencia de inserción
-			sentenciaSQL = "INSERT INTO alumnos (dni, nombre, apellido, genero) VALUES " +
-					"(" + Integer.parseInt(inputs[0]) + "," +
+			sentenciaSQL = "INSERT INTO mesas_de_examen (legajo_profesor, id_materia, fecha_evaluacion, hora_evaluacion) VALUES " +
+					"(" + inputs[0] + "," +
 					"\'" + inputs[1] + "\'," +
-					"\'" + inputs[2] + "\'," +
+					"str_to_date(\'" + inputs[2] + "\', '%d/%m/%Y')," +
 					"\'" + inputs[3] + "\');";
 			// Ejecuto la inserción del nuevo alumno
 			DriverBD.driver().nuevaConexion();
@@ -57,16 +56,16 @@ public class ControladorAlumno implements ControladorModelo {
 			
 		}
 		if (!solicitudExitosa) {
-			throw new DBUpdateException("¡ERROR! falló el registro del nuevo alumno.\n" +
+			throw new DBUpdateException("¡ERROR! falló el registro de la nueva mesa de exámen.\n" +
 					"Detalle: " + mensajeError);
 		}
 	}
 	
 	
 	/**
-	 * modificar: modifica datos de registro de un alumno en base a datos
+	 * modificar: modifica datos de registro de una mesa de examen en base a datos
 	   de entrada asociados a sus atributos
-	 * @param inputs: arreglo de atributos del nuevo alumno a modificar
+	 * @param inputs: arreglo de atributos de la mesa de examen a modificar
 	 */
 	public void modificar (String [] inputs) throws DBUpdateException {
 		String sentenciaSQL = "";
@@ -78,7 +77,7 @@ public class ControladorAlumno implements ControladorModelo {
 			asignacionesSQL = generarAsignacionesSQL(inputs);
 			
 			if (asignacionesSQL.length() > 0) {
-				sentenciaSQL = "UPDATE alumnos SET " + asignacionesSQL + " WHERE (LU = " + inputs[0] + ")";
+				sentenciaSQL = "UPDATE mesas_de_examen SET " + asignacionesSQL + " WHERE (id = " + inputs[0] + ")";
 				DriverBD.driver().nuevaConexion();
 				DriverBD.driver().actualizar(sentenciaSQL);
 				DriverBD.driver().cerrarConexion();
@@ -90,16 +89,16 @@ public class ControladorAlumno implements ControladorModelo {
 			mensajeError = ex.getMessage();
 		}
 		if (!solicitudExitosa) {
-			throw new DBUpdateException("¡ERROR! falló la modificación de datos del alumno con LU: " + inputs[0] + ".\n" +
+			throw new DBUpdateException("¡ERROR! falló la modificación de datos de la mesa de examen con ID: " + inputs[0] + ".\n" +
 					"Detalle: " + mensajeError);
 		}
 	}
 	
 	
 	/**
-	 * eliminar: elimina datos de registro de un alumno en base a datos
+	 * eliminar: elimina datos de registro de una mesa de examen en base a datos
 	   de entrada asociados a sus atributos
-	 * @param inputs: arreglo de atributos del nuevo alumno a eliminar
+	 * @param inputs: arreglo de atributos de la mesa de examen a eliminar
 	 */
 	public void eliminar (String input) throws DBUpdateException {
 		String sentenciaSQL;
@@ -108,7 +107,7 @@ public class ControladorAlumno implements ControladorModelo {
 		try
 		{
 			// Genero la sentencia de inserción
-			sentenciaSQL = "DELETE FROM alumnos WHERE ( LU = " + input + ")";
+			sentenciaSQL = "DELETE FROM mesas_de_examen WHERE (id = " + input + ")";
 			// Ejecuto la inserción del nuevo alumno
 			DriverBD.driver().nuevaConexion();
 			DriverBD.driver().actualizar(sentenciaSQL);
@@ -121,14 +120,14 @@ public class ControladorAlumno implements ControladorModelo {
 			
 		}
 		if (!solicitudExitosa) {
-			throw new DBUpdateException("¡ERROR! falló la baja del alumno con LU: " + input + ".\n" +
+			throw new DBUpdateException("¡ERROR! falló la baja de la mesa de examen con ID: " + input + ".\n" +
 					"Detalle: " + mensajeError);
 		}		
 	}
 	
 	
 	/**
-	 * volcar: solicita la carga de datos asociados a los alumnos registrados en
+	 * volcar: solicita la carga de datos asociados a las mesas de examen registrados en
 	   el sistema.
 	 * tb: objeto DBTable (tabla de datos) donde se aplicará la carga de los datos de alumnos.
 	 */
@@ -138,7 +137,7 @@ public class ControladorAlumno implements ControladorModelo {
 		
 		try
 	    {
-			sentenciaSQL = "SELECT * FROM alumnos";
+			sentenciaSQL = "SELECT * FROM mesas_de_examen";
 			DriverBD.driver().volcar(tb,sentenciaSQL);
 	    }		
 		catch (SQLException ex)
@@ -147,31 +146,32 @@ public class ControladorAlumno implements ControladorModelo {
 	    }
 		// Si la consulta no fue exitosa, entonces falló el volcado de datos
 		if (!consultaExitosa) {
-			throw new DBRetrieveException("¡ERROR! falló el volcado de los datos de alumnos en la tabla");
+			throw new DBRetrieveException("¡ERROR! falló el volcado de los datos de mesas_de_examen en la tabla");
 		}
 	}
 	
 	
-	public Alumno recuperar (String [] inputs) throws DBRetrieveException {
+	public MesaDeExamen recuperar (String [] inputs) throws DBRetrieveException {
+		ResultSet rs;
 		String sentenciaSQL;
 		String asignacionesSQL = null;
 		String mensajeError = null;
-		Alumno alumno = null;		
+		MesaDeExamen mesa = null;		
 		boolean solicitudExitosa = true;	
 		try
 		{
 			asignacionesSQL = generarAsignacionesSQL(inputs);
-			sentenciaSQL = "SELECT * FROM alumnos WHERE (LU = " + inputs[0];
+			sentenciaSQL = "SELECT * FROM mesas_de_examen WHERE (id = " + inputs[0];
 			// Si hay asignaciones adicionales, las incorporo a la sentencia
 			if (asignacionesSQL.length() > 0) {
 				sentenciaSQL +=  ", " + asignacionesSQL;
 			}
 			sentenciaSQL += ")";
 			DriverBD.driver().nuevaConexion();
-			ResultSet rs = DriverBD.driver().consultar(sentenciaSQL);
+			rs = DriverBD.driver().consultar(sentenciaSQL);
 			// Si hay un resultado siguiente, lo recupero
 			if (rs.next()) {
-				alumno = Alumno.extraerModelo(rs);
+				mesa = MesaDeExamen.extraerModelo(rs);
 			}
 			DriverBD.driver().cerrarConexion();
 		}
@@ -181,10 +181,10 @@ public class ControladorAlumno implements ControladorModelo {
 			mensajeError = ex.getMessage();
 		}
 		if (!solicitudExitosa) {
-			throw new DBRetrieveException("¡ERROR! falló la recuperación del alumno con parámetros " + Arrays.deepToString(inputs) + ".\n" +
+			throw new DBRetrieveException("¡ERROR! falló la recuperación de la mesa con parámetros " + Arrays.deepToString(inputs) + ".\n" +
 					"Detalle: " + mensajeError);
 		}
-		return alumno;
+		return mesa;
 	}
 	
 	
@@ -193,7 +193,7 @@ public class ControladorAlumno implements ControladorModelo {
 		boolean hayAsignacionAnterior = false;
 		// Genero la sentencia de inserción
 		if (inputs[1] != null) {
-			asignacionesSQL += "dni = " + inputs[1];
+			asignacionesSQL += "legajo_profesor = " + inputs[1];
 			hayAsignacionAnterior = true;
 		}
 		if (inputs[2] != null) {
@@ -201,7 +201,7 @@ public class ControladorAlumno implements ControladorModelo {
 				asignacionesSQL += ", ";				
 			}
 			else hayAsignacionAnterior = true;
-			asignacionesSQL += "nombre = \'" + inputs[2] + "\'";
+			asignacionesSQL += "id_materia = " + inputs[2];
 			
 		}
 		if (inputs[3] != null) {
@@ -209,14 +209,14 @@ public class ControladorAlumno implements ControladorModelo {
 				asignacionesSQL += ", ";
 			}
 			else hayAsignacionAnterior = true;
-			asignacionesSQL += "apellido = \'" + inputs[3] + "\'";
+			asignacionesSQL += "fecha_evaluacion = str_to_date(\'" + inputs[3] + "\', '%d/%m/%Y')";
 		}
 		if (inputs[4] != null) {
 			if (hayAsignacionAnterior) {
 				asignacionesSQL += ", ";
 			}
 			else hayAsignacionAnterior = true;
-			asignacionesSQL += "genero = \'" + inputs[4] + "\'";
+			asignacionesSQL += "hora_evaluacion = \'" + inputs[4] + "\'";
 		}
 		return asignacionesSQL;
 	}
@@ -228,9 +228,9 @@ public class ControladorAlumno implements ControladorModelo {
 	 * @return lista de modelos de alumnos
 	 */
 	public List<Modelo> elementos () throws DBRetrieveException {
-		List<Modelo> listaAlumnos = new LinkedList<Modelo>();
+		List<Modelo> listaMesas = new LinkedList<Modelo>();
 		ResultSet rs;
-		Alumno alumno;
+		MesaDeExamen mesa;
 		String sentenciaSQL;
 		String mensajeError = null;	
 		boolean solicitudExitosa = true;	
@@ -241,8 +241,8 @@ public class ControladorAlumno implements ControladorModelo {
 			rs = DriverBD.driver().consultar(sentenciaSQL);
 			// Mientras haya un resultado siguiente, lo recupero
 			while (rs.next()) {
-				alumno = Alumno.extraerModelo(rs);
-				listaAlumnos.add(alumno);
+				mesa = MesaDeExamen.extraerModelo(rs);
+				listaMesas.add(mesa);
 			}
 			DriverBD.driver().cerrarConexion();
 		}
@@ -252,38 +252,96 @@ public class ControladorAlumno implements ControladorModelo {
 			mensajeError = ex.getMessage();
 		}
 		if (!solicitudExitosa) {
-			throw new DBRetrieveException("¡ERROR! falló la recuperación todos los alumnos.\n" +
+			throw new DBRetrieveException("¡ERROR! falló la recuperación todas las mesas.\n" +
 					"Detalle: " + mensajeError);
 		}
-		return listaAlumnos;
+		return listaMesas;
 	}
 	
 	
-	public List<Alumno> alumnosDelDictado (int idDict) throws DBRetrieveException {
-		List<Alumno> listaAlumnos = new LinkedList<Alumno>();
+	public List<MesaDeExamen> mesasProfesorMateria (int idMat, int lg) throws DBRetrieveException {
+		List<MesaDeExamen> listaMesas = new LinkedList<MesaDeExamen>();
 		ResultSet rs;
-		Alumno alumno = null;
+		MesaDeExamen mesa;
+		String sentenciaSQL;
+		String mensajeError = null;	
+		boolean solicitudExitosa = true;	
+		try
+		{
+			sentenciaSQL = "SELECT *\r\n" + 
+					"FROM mesas_de_examen\r\n" + 
+					"WHERE (legajo_profesor = " + lg + " AND id_materia = " + idMat + ");";
+			DriverBD.driver().nuevaConexion();
+			rs = DriverBD.driver().consultar(sentenciaSQL);
+			// Mientras haya un resultado siguiente, lo recupero
+			while (rs.next()) {
+				mesa = MesaDeExamen.extraerModelo(rs);
+				listaMesas.add(mesa);
+			}
+			DriverBD.driver().cerrarConexion();
+		}
+		catch (SQLException ex)
+		{
+			solicitudExitosa = false;
+			mensajeError = ex.getMessage();
+		}
+		if (!solicitudExitosa) {
+			throw new DBRetrieveException("¡ERROR! falló la recuperación todas las mesas.\n" +
+					"Detalle: " + mensajeError);
+		}
+		return listaMesas;
+	}
+	
+	
+	public List<MesaDeExamen> mesasFuturasDeMateria (int idMat) throws DBRetrieveException {
+		List<MesaDeExamen> listaMesas = new LinkedList<MesaDeExamen>();
+		ResultSet rs;
+		MesaDeExamen mesa;
+		String sentenciaSQL;
+		String mensajeError = null;	
+		boolean solicitudExitosa = true;	
+		try
+		{
+			sentenciaSQL = "SELECT *\r\n" + 
+					"FROM mesas_de_examen\r\n" + 
+					"WHERE (id_materia = " + idMat + " AND fecha_evaluacion > CURDATE());";
+			DriverBD.driver().nuevaConexion();
+			rs = DriverBD.driver().consultar(sentenciaSQL);
+			// Mientras haya un resultado siguiente, lo recupero
+			while (rs.next()) {
+				mesa = MesaDeExamen.extraerModelo(rs);
+				listaMesas.add(mesa);
+			}
+			DriverBD.driver().cerrarConexion();
+		}
+		catch (SQLException ex)
+		{
+			solicitudExitosa = false;
+			mensajeError = ex.getMessage();
+		}
+		if (!solicitudExitosa) {
+			throw new DBRetrieveException("¡ERROR! falló la recuperación todas las mesas.\n" +
+					"Detalle: " + mensajeError);
+		}
+		return listaMesas;
+	}
+
+	
+	public void asignarCalificacion(int lu, int idMesa, String estado, String nota) throws DBUpdateException {
 		String sentenciaSQL;
 		String mensajeError = null;	
 		boolean solicitudExitosa = true;
 		try
 		{
-			sentenciaSQL = "SELECT LU, dni, nombre, apellido, genero " +
-					"FROM (\r\n" + 
-					"				SELECT *\r\n" + 
-					"				FROM inscripciones_dictados\r\n" + 
-					"				WHERE (id_dictado = " + idDict + ")\r\n" + 
-					"			) as ID\r\n" + 
-					"			NATURAL JOIN\r\n" + 
-					"			alumnos as A\r\n" + 
-					"WHERE (ID.LU_alumno = A.LU);";
+			sentenciaSQL = "INSERT INTO calificaciones_finales (LU_alumno, id_mesa, fecha_calificacion, estado, puntaje) VALUES " + 
+	        		 	 "(" + lu + "," + 
+	        		 	 "" + idMesa + "," +
+	        		 	 " CURDATE()," +
+	        		 	 "\'" + estado + "\'," +
+	        		 	 "" + nota + ");";
 			
 			DriverBD.driver().nuevaConexion();
-			rs = DriverBD.driver().consultar(sentenciaSQL);			
-			while (rs.next()) {
-				alumno = Alumno.extraerModelo(rs);
-				listaAlumnos.add(alumno);
-			}
+			DriverBD.driver().actualizar(sentenciaSQL);
 			DriverBD.driver().cerrarConexion();
 		}
 		catch (SQLException ex)
@@ -291,51 +349,12 @@ public class ControladorAlumno implements ControladorModelo {
 			solicitudExitosa = false;
 			mensajeError = ex.getMessage();
 		}
+
 		if (!solicitudExitosa) {
-			throw new DBRetrieveException("¡ERROR! falló la recuperación todas los alumnos del dictado con ID: " + idDict + ".\n" +
-					"Detalle: " + mensajeError);
+			throw new DBUpdateException("¡ERROR! falló la asignación de la calificación al alumno con LU: " + lu +
+					" sobre la mesa de examen con ID: " + idMesa + ".\n" + "Detalle: " + mensajeError);
 		}
-		return listaAlumnos;
-	}
-	
-	
-	public List<Alumno> alumnosEnMesa (int idMesa) throws DBRetrieveException {
-		List<Alumno> listaAlumnos = new LinkedList<Alumno>();
-		ResultSet rs;
-		Alumno alumno = null;
-		String sentenciaSQL;
-		String mensajeError = null;	
-		boolean solicitudExitosa = true;
-		try
-		{
-			sentenciaSQL = "SELECT DISTINCT LU, dni, nombre, apellido, genero\r\n" + 
-					"FROM (\r\n" + 
-					"				SELECT LU_alumno\r\n" + 
-					"				FROM inscripciones_finales\r\n" + 
-					"				WHERE (id_mesa = " + idMesa + ")\r\n" + 
-					"			) as I\r\n" + 
-					"			NATURAL JOIN\r\n" + 
-					"			alumnos\r\n" + 
-					"WHERE (LU = LU_alumno);";
-			
-			DriverBD.driver().nuevaConexion();
-			rs = DriverBD.driver().consultar(sentenciaSQL);			
-			while (rs.next()) {
-				alumno = Alumno.extraerModelo(rs);
-				listaAlumnos.add(alumno);
-			}
-			DriverBD.driver().cerrarConexion();
-		}
-		catch (SQLException ex)
-		{
-			solicitudExitosa = false;
-			mensajeError = ex.getMessage();
-		}
-		if (!solicitudExitosa) {
-			throw new DBRetrieveException("¡ERROR! falló la recuperación todas los alumnos de la mesa de examen con ID: " + idMesa + ".\n" +
-					"Detalle: " + mensajeError);
-		}
-		return listaAlumnos;
+		
 	}
 
 }

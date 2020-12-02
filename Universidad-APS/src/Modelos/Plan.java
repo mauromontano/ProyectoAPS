@@ -3,7 +3,7 @@ package Modelos;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Plan {
+public class Plan implements Modelo {
 	
 	private int id;
 	private int idCarrera;
@@ -22,7 +22,7 @@ public class Plan {
 	 * @param rs: colección de filas de alumnos.
 	 * @return primer modelo de alumno de la colección de filas del result set. 
 	 */
-	public static Plan siguienteModelo (ResultSet rs) {		
+	public static Plan extraerModelo (ResultSet rs) {		
 		int i;
 		int ic;
 		int v;
@@ -53,6 +53,10 @@ public class Plan {
 	
 	public int obtenerVersion () {
 		return version;
+	}
+	
+	public String toString () {
+		return "" + version;
 	}
 
 

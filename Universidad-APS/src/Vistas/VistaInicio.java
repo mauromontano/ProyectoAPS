@@ -5,21 +5,19 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
-
 import java.awt.Font;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
 import javax.swing.border.LineBorder;
-
 import Controladores.ControladorLogin;
-import Excepciones.ExcepcionAutenticacion;
-
+import Excepciones.AuthException;
 import java.awt.SystemColor;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.DefaultComboBoxModel;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.Color;
 
 public class VistaInicio extends JPanel {
 
@@ -95,6 +93,7 @@ public class VistaInicio extends JPanel {
 		add(btnLogin);
 		
 		JLabel lblInicio = new JLabel("Inicio de sesi\u00F3n");
+		lblInicio.setForeground(Color.DARK_GRAY);
 		lblInicio.setFont(new Font("Microsoft YaHei UI Light", Font.BOLD, 16));
 		lblInicio.setHorizontalAlignment(SwingConstants.CENTER);
 		lblInicio.setBounds(120, 11, 148, 20);
@@ -111,8 +110,10 @@ public class VistaInicio extends JPanel {
 		try 
 		{
 			ControladorLogin.controlador().login(categoria, usuario, contenidoPswd);
+			inputUsuario.setText("");
+			inputPswd.setText("");
 		}
-		catch (ExcepcionAutenticacion ex) 
+		catch (AuthException ex) 
 		{
 			JOptionPane.showMessageDialog(SwingUtilities.getWindowAncestor(this),
 					   ex.getMessage(),

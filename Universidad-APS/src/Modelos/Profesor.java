@@ -3,11 +3,12 @@ package Modelos;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Profesor {
+public class Profesor implements Modelo {
 	
+	private int legajo;
+	private int cuil;
 	private int matricula;
 	private int dni;
-	private int cuil;
 	private String nombre;
 	private String apellido;	
 	private String genero;
@@ -16,7 +17,8 @@ public class Profesor {
 	/**
 	 * CONSTRUCTOR: modelo de profesor
 	 */	
-	public Profesor (int matr, int dni, int cuil, String nombre, String apellido, String genero ) {
+	public Profesor (int lg, int matr, int dni, int cuil, String nombre, String apellido, String genero) {
+		this.legajo = lg;
 		this.matricula = matr;
 		this.dni = dni;
 		this.cuil = cuil;
@@ -27,12 +29,13 @@ public class Profesor {
 	
 	
 	/**
-	 * siguienteModelo: retorna el sigueinte Alumno de una coleccion de filas resultado
+	 * siguienteModelo: retorna el sigueinte Profesor de una coleccion de filas resultado
 	   de una consulta SQL (result set) y desplaza el cursor a la fila próxima.
-	 * @param rs: colección de filas de alumnos.
-	 * @return primer modelo de alumno de la colección de filas del result set. 
+	 * @param rs: colección de filas de profesores.
+	 * @return primer modelo de profesor de la colección de filas del result set. 
 	 */
-	public static Profesor siguienteModelo (ResultSet rs) {		
+	public static Profesor extraerModelo (ResultSet rs) {		
+		int lg;
 		int matr;
 		int d;
 		int c;
@@ -41,68 +44,82 @@ public class Profesor {
 		String gen;
 		try 
 		{
-			matr = Integer.parseInt(rs.getString(1));
-			d = Integer.parseInt(rs.getString(2));
-			c = Integer.parseInt(rs.getString(3));
-			nom = rs.getString(4);
-			ap = rs.getString(5);
-			gen = rs.getString(6);
-			rs.next();
-			return new Profesor(matr, d, c, nom, ap, gen);
+			lg = Integer.parseInt(rs.getString(1));
+			matr = Integer.parseInt(rs.getString(2));
+			d = Integer.parseInt(rs.getString(3));
+			c = Integer.parseInt(rs.getString(4));
+			nom = rs.getString(5);
+			ap = rs.getString(6);
+			gen = rs.getString(7);
+			return new Profesor(lg, matr, d, c, nom, ap, gen);
 		}
 		catch (NumberFormatException | SQLException ex) 
 		{
-			ex.printStackTrace();
+			System.out.println("Fernandez la concha puta de tu madre");
 		}
 		return null;
-	}	
+	}
 	
 	/**
-	 * obtenerLU: retorna el número de libreta universitaria del alumno.
-	 * @return número de libreta universitaria asociada al alumno.
+	 * obtenerLegajo: retorna el número de legajo universitario del profesor.
+	 * @return número de legajo universitario asociado al profesor.
+	 */
+	public int obtenerLegajo () {
+		return legajo;
+	}	
+	
+	
+	/**
+	 * obtenerMatrícula: retorna el número de matrícula del profesor.
+	 * @return número de matrícula asociado al profesor.
 	 */
 	public int obtenerMatricula () {
 		return matricula;
 	}	
 	
 	/**
-	 * obtenerLU: retorna el número de libreta universitaria del alumno.
-	 * @return número de libreta universitaria asociada al alumno.
+	 * obtenerDni: retorna el número de documento del profesor.
+	 * @return número de documento asociado al profesor.
 	 */
 	public int obtenerDni () {
 		return dni;
 	}
 	
 	/**
-	 * obtenerLU: retorna el número de libreta universitaria del alumno.
-	 * @return número de libreta universitaria asociada al alumno.
+	 * obtenerCuil: retorna el número de CUIL del profesor.
+	 * @return número de CUIL asociado al profesor.
 	 */
 	public int obtenerCuil () {
 		return cuil;
 	}
 	
 	/**
-	 * obtenerLU: retorna el número de libreta universitaria del alumno.
-	 * @return número de libreta universitaria asociada al alumno.
+	 * obtenerNombre: retorna el nombre de pila del profesor.
+	 * @return nombre de pila correspondiente al profesor.
 	 */
 	public String obtenerNombre () {
 		return new String(nombre);
 	}	
 	
 	/**
-	 * obtenerLU: retorna el número de libreta universitaria del alumno.
-	 * @return número de libreta universitaria asociada al alumno.
+	 * obtenerNombre: retorna el apellido del profesor.
+	 * @return apellido correspondiente al profesor.
 	 */
 	public String obtenerApellido () {
 		return new String(apellido);
 	}
 	
 	/**
-	 * obtenerLU: retorna el número de libreta universitaria del alumno.
-	 * @return número de libreta universitaria asociada al alumno.
+	 * obtenerGenero: retorna el género alumno.
+	 * @return género correspondiente al alumno.
 	 */
 	public String obtenerGenero () {
 		return new String(genero);
-	}	
+	}
+	
+	
+	public String toString () {
+		return nombre + " " + apellido + " [" + legajo + "]";
+	}
 
 }
