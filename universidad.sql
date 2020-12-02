@@ -19,24 +19,6 @@ CREATE SCHEMA IF NOT EXISTS `universidad` DEFAULT CHARACTER SET utf8 ;
 USE `universidad` ;
 
 -- -----------------------------------------------------
--- Table `universidad`.`profesores`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `universidad`.`profesores` ;
-
-CREATE TABLE IF NOT EXISTS `universidad`.`profesores` (
-  `matricula` INT UNSIGNED NOT NULL,
-  `dni` INT UNSIGNED NOT NULL,
-  `nombre` VARCHAR(45) NULL,
-  `apellido` VARCHAR(45) NULL,
-  `cuil` INT UNSIGNED NOT NULL,
-  `genero` VARCHAR(45) NULL,
-  PRIMARY KEY (`matricula`),
-  UNIQUE INDEX `matricula_UNIQUE` (`matricula` ASC) VISIBLE,
-  UNIQUE INDEX `dni_UNIQUE` (`dni` ASC) VISIBLE)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `universidad`.`alumnos`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `universidad`.`alumnos` ;
@@ -50,6 +32,27 @@ CREATE TABLE IF NOT EXISTS `universidad`.`alumnos` (
   PRIMARY KEY (`LU`),
   UNIQUE INDEX `dni_UNIQUE` (`dni` ASC) VISIBLE,
   UNIQUE INDEX `LU_UNIQUE` (`LU` ASC) VISIBLE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `universidad`.`profesores`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`profesores` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`profesores` (
+  `legajo` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `matricula` INT UNSIGNED NOT NULL,
+  `dni` INT UNSIGNED NOT NULL,  
+  `cuil` INT UNSIGNED NOT NULL,
+  `nombre` VARCHAR(45) NULL,
+  `apellido` VARCHAR(45) NULL,
+  `genero` VARCHAR(45) NULL,
+  PRIMARY KEY (`legajo`),
+  UNIQUE INDEX `legajo_UNIQUE` (`legajo` ASC) VISIBLE,
+  UNIQUE INDEX `matricula_UNIQUE` (`matricula` ASC) VISIBLE,
+  UNIQUE INDEX `dni_UNIQUE` (`dni` ASC) VISIBLE,
+  UNIQUE INDEX `cuil_UNIQUE` (`cuil` ASC) VISIBLE)
 ENGINE = InnoDB;
 
 
@@ -96,42 +99,18 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `universidad`.`inscripciones`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `universidad`.`inscripciones` ;
-
-CREATE TABLE IF NOT EXISTS `universidad`.`inscripciones` (
-  `fecha` DATE NOT NULL,
-  `nombre_carrera` VARCHAR(45) NOT NULL,
-  `LU_alumnos` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`nombre_carrera`, `LU_alumnos`, `fecha`),
-  INDEX `LU_alumno_idx` (`LU_alumnos` ASC) VISIBLE,
-  CONSTRAINT `fk_carrera_inscripciones`
-    FOREIGN KEY (`nombre_carrera`)
-    REFERENCES `universidad`.`carreras` (`nombre`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_lu_inscripciones`
-    FOREIGN KEY (`LU_alumnos`)
-    REFERENCES `universidad`.`alumnos` (`LU`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
 -- Table `universidad`.`planes`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `universidad`.`planes` ;
 
 CREATE TABLE IF NOT EXISTS `universidad`.`planes` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre_carrera` VARCHAR(45) NOT NULL,
+  `id_carrera` INT UNSIGNED NOT NULL,
   `version` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   CONSTRAINT `fk_carrera_asociada`
-    FOREIGN KEY (`nombre_carrera`)
-    REFERENCES `universidad`.`carreras` (`nombre`)
+    FOREIGN KEY (`id_carrera`)
+    REFERENCES `universidad`.`carreras` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
 	
@@ -159,8 +138,9 @@ DROP TABLE IF EXISTS `universidad`.`correlativas` ;
 
 CREATE TABLE IF NOT EXISTS `universidad`.`correlativas` (
   `id_materia` INT UNSIGNED NOT NULL,
-  `id_correlativa` INT UNSIGNED NOT NULL,
-  PRIMARY KEY (`id_materia`, `id_correlativa`),
+  `id_plan` INT UNSIGNED NOT NULL,
+  `id_correlativa` INT UNSIGNED,
+  PRIMARY KEY (`id_materia`, `id_correlativa`, `id_plan`),
   CONSTRAINT `fk_materia_correlativa`
     FOREIGN KEY (`id_materia`)  REFERENCES `universidad`.`materias` (`id` )
     ON DELETE NO ACTION
@@ -168,64 +148,17 @@ CREATE TABLE IF NOT EXISTS `universidad`.`correlativas` (
    CONSTRAINT `fk_correlativa`
     FOREIGN KEY (`id_correlativa`)  REFERENCES `universidad`.`materias` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION
- )
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `universidad`.`notas`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `universidad`.`notas` ;
-
-CREATE TABLE IF NOT EXISTS `universidad`.`notas` (
-  `LU_alumnos` INT UNSIGNED NOT NULL,
-  `id_materia` INT UNSIGNED NOT NULL,
-  `fecha_evaluacion` DATE NOT NULL,
-  `puntaje` INT UNSIGNED NOT NULL,
-  `estado` VARCHAR(25) NOT NULL,
-  PRIMARY KEY (`LU_alumnos`, `id_materia`, `fecha_evaluacion`),
-  INDEX `id_materia_idx` (`id_materia` ASC) VISIBLE,
-  CONSTRAINT `fk_lu_nota`
-    FOREIGN KEY (`LU_alumnos`)
-    REFERENCES `universidad`.`alumnos` (`LU`)
-    ON DELETE NO ACTION
     ON UPDATE NO ACTION,
-  CONSTRAINT `fk_materia_nota`
-    FOREIGN KEY (`id_materia`)
-    REFERENCES `universidad`.`materias` (`id`)
+	CONSTRAINT `fk_plan_asociado`
+    FOREIGN KEY (`id_plan`)  REFERENCES `universidad`.`planes` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)
+	
 ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
--- Table `universidad`.`dictan`
--- -----------------------------------------------------
-DROP TABLE IF EXISTS `universidad`.`dictan` ;
-
-CREATE TABLE IF NOT EXISTS `universidad`.`dictan` (
-  `id_materia` INT UNSIGNED NOT NULL,
-  `matricula_profesor` INT UNSIGNED NOT NULL,
-  `año` YEAR NOT NULL,
-  `cuatrimestre` SMALLINT(1) UNSIGNED NOT NULL,
-  PRIMARY KEY (`id_materia`, `año`, `cuatrimestre`),
-  INDEX `matricula_profesor_idx` (`matricula_profesor` ASC) VISIBLE,
-  CONSTRAINT `fk_materia_dicta`
-    FOREIGN KEY (`id_materia`)
-    REFERENCES `universidad`.`materias` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
-  CONSTRAINT `fk_matricula_dicta`
-    FOREIGN KEY (`matricula_profesor`)
-    REFERENCES `universidad`.`profesores` (`matricula`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-ENGINE = InnoDB;
-
-
--- -----------------------------------------------------
--- Table `universidad`.`planes_materias``
+-- Table `universidad`.`planes_materias`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `universidad`.`planes_materias` ;
 
@@ -243,9 +176,193 @@ CREATE TABLE IF NOT EXISTS `universidad`.`planes_materias` (
     FOREIGN KEY (`id_materia`)
     REFERENCES `universidad`.`materias` (`id`)
     ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
-	
+    ON UPDATE NO ACTION)	
 ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `universidad`.`dictados`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`dictados` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`dictados` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `legajo_profesor` INT UNSIGNED NOT NULL,
+  `id_materia_dictada` INT UNSIGNED NOT NULL,
+  `id_plan_materia` INT UNSIGNED NOT NULL,
+  `anio` INT UNSIGNED NOT NULL,
+  `cuatrimestre` SMALLINT(1) UNSIGNED NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `legajo_profesor_idx` (`legajo_profesor` ASC) VISIBLE,
+  CONSTRAINT `fk_materia_dicta`
+    FOREIGN KEY (`id_materia_dictada`)
+    REFERENCES `universidad`.`planes_materias` (`id_materia`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+	CONSTRAINT `fk_plan_dicta`
+    FOREIGN KEY (`id_plan_materia`)
+    REFERENCES `universidad`.`planes_materias` (`id_plan`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_legajo_dicta`
+    FOREIGN KEY (`legajo_profesor`)
+    REFERENCES `universidad`.`profesores` (`legajo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `universidad`.`inscripciones_dictados`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`inscripciones_dictados` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`inscripciones_dictados` (
+  `LU_alumno` INT UNSIGNED NOT NULL,  
+  `id_dictado` INT UNSIGNED NOT NULL, 
+  `fecha` DATE NOT NULL,
+  `estado` VARCHAR(45) NOT NULL DEFAULT 'Activa',
+  PRIMARY KEY (`LU_alumno`, `id_dictado`, `fecha`),
+  INDEX `LU_alumno_idx` (`LU_alumno` ASC) VISIBLE,
+  CONSTRAINT `fk_dictado_inscripciones`
+    FOREIGN KEY (`id_dictado`)
+    REFERENCES `universidad`.`dictados` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_LU_inscripto_dictado`
+    FOREIGN KEY (`LU_alumno`)
+    REFERENCES `universidad`.`alumnos` (`LU`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `universidad`.`calificaciones_dictados`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`calificaciones_dictados` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`calificaciones_dictados` (
+  `LU_alumno` INT UNSIGNED NOT NULL,
+  `id_dictado` INT UNSIGNED NOT NULL,
+  `fecha_calificacion` DATE NOT NULL,
+  `estado` VARCHAR(25) NOT NULL,
+ 
+  PRIMARY KEY (`LU_alumno`, `id_dictado`),
+  INDEX `fecha_evaluacion_idx` (`fecha_calificacion` DESC) VISIBLE,
+  CONSTRAINT `fk_lu_evaluado_dict`
+    FOREIGN KEY (`LU_alumno`)
+    REFERENCES `universidad`.`inscripciones_dictados` (`LU_alumno`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_dictado_evaluado`
+    FOREIGN KEY (`id_dictado`)
+    REFERENCES `universidad`.`inscripciones_dictados` (`id_dictado`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `universidad`.`inscripciones_carreras`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`inscripciones_carreras` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`inscripciones_carreras` (
+  `LU_alumno` INT UNSIGNED NOT NULL,  
+  `id_plan` INT UNSIGNED NOT NULL, 
+  `fecha` DATE NOT NULL,
+  PRIMARY KEY (`LU_alumno`, `id_plan`, `fecha`),
+  INDEX `LU_alumno_idx` (`LU_alumno` ASC) VISIBLE,
+  CONSTRAINT `fk_carrera_inscripciones`
+    FOREIGN KEY (`id_plan`)
+    REFERENCES `universidad`.`planes` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_LU_inscripto_carrera`
+    FOREIGN KEY (`LU_alumno`)
+    REFERENCES `universidad`.`alumnos` (`LU`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `universidad`.`mesas_de_examen`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`mesas_de_examen` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`mesas_de_examen` (
+  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `legajo_profesor` INT UNSIGNED NOT NULL,
+  `id_materia` INT UNSIGNED NOT NULL,
+  `fecha_evaluacion`  DATE NOT NULL,
+  `hora_evaluacion` VARCHAR(5) NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `legajo_profesor_idx` (`legajo_profesor` ASC) VISIBLE,
+  CONSTRAINT `fk_legajo_profesor`
+    FOREIGN KEY (`legajo_profesor`)
+    REFERENCES `universidad`.`profesores` (`legajo`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_materia_evaluada`
+    FOREIGN KEY (`id_materia`)
+    REFERENCES `universidad`.`materias` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `universidad`.`inscripciones_finales`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`inscripciones_finales` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`inscripciones_finales` (
+  `LU_alumno` INT UNSIGNED NOT NULL,  
+  `id_mesa` INT UNSIGNED NOT NULL, 
+  `fecha_inscripcion` DATE NOT NULL,
+  PRIMARY KEY (`LU_alumno`, `id_mesa`),
+  INDEX `LU_alumno_idx` (`LU_alumno` ASC) VISIBLE,
+  CONSTRAINT `fk_final_inscripciones`
+    FOREIGN KEY (`id_mesa`)
+    REFERENCES `universidad`.`mesas_de_examen` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_LU_inscripto_mesa`
+    FOREIGN KEY (`LU_alumno`)
+    REFERENCES `universidad`.`alumnos` (`LU`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `universidad`.`calificaciones_finales`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `universidad`.`calificaciones_finales` ;
+
+CREATE TABLE IF NOT EXISTS `universidad`.`calificaciones_finales` (
+  `LU_alumno` INT UNSIGNED NOT NULL,
+  `id_mesa` INT UNSIGNED NOT NULL,
+  `fecha_calificacion` DATE NOT NULL,
+  `estado` VARCHAR(25) NOT NULL,
+  `puntaje` INT UNSIGNED,
+ 
+  PRIMARY KEY (`LU_alumno`, `id_mesa`),
+  INDEX `fecha_calificacion_idx` (`fecha_calificacion` DESC) VISIBLE,
+  CONSTRAINT `fk_lu_evaluado_mesa`
+    FOREIGN KEY (`LU_alumno`)
+    REFERENCES `universidad`.`inscripciones_finales` (`LU_alumno`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_mesa_evaluacion`
+    FOREIGN KEY (`id_mesa`)
+    REFERENCES `universidad`.`inscripciones_finales` (`id_mesa`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
+
 
 SET SQL_MODE = ``;
 DROP USER IF EXISTS admin_uni;
