@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 USE `universidad` ; 
 
 /* Alumnos */
@@ -101,13 +101,33 @@ USE `universidad` ;
 	INSERT INTO inscripciones_dictados (LU_alumno, id_dictado, fecha, estado) VALUES (1, 1, curdate() - INTERVAL 560 DAY, "Expirada");
 	INSERT INTO inscripciones_dictados (LU_alumno, id_dictado, fecha, estado) VALUES (1, 2, curdate() - INTERVAL 460 DAY, "Expirada");
 	INSERT INTO inscripciones_dictados (LU_alumno, id_dictado, fecha, estado) VALUES (1, 3, curdate() - INTERVAL 220 DAY, "Expirada");
+	INSERT INTO inscripciones_dictados (LU_alumno, id_dictado, fecha, estado) VALUES (2, 1, curdate() - INTERVAL 560 DAY, "Expirada");
+	INSERT INTO inscripciones_dictados (LU_alumno, id_dictado, fecha, estado) VALUES (3, 1, curdate() - INTERVAL 560 DAY, "Expirada");
+	INSERT INTO inscripciones_dictados (LU_alumno, id_dictado, fecha, estado) VALUES (4, 1, curdate() - INTERVAL 560 DAY, "Expirada");
 	/*INSERT INTO inscripciones_dictados (LU_alumno, id_dictado, fecha, estado) VALUES (1, 3, curdate() - INTERVAL 120 DAY, "Expirada");*/
+	INSERT INTO inscripciones_dictados (LU_alumno, id_dictado, fecha, estado) VALUES (2, 1, curdate() - INTERVAL 560 DAY, "Expirada");
 	
+
 	/* Calificaciones de dictados */
 	INSERT INTO calificaciones_dictados (LU_alumno, id_dictado, fecha_calificacion, estado) VALUES (1, 1, curdate() - INTERVAL 330 DAY, "Desaprobado");
 	INSERT INTO calificaciones_dictados (LU_alumno, id_dictado, fecha_calificacion, estado) VALUES (1, 2, curdate() - INTERVAL 230 DAY, "Aprobado");
 	INSERT INTO calificaciones_dictados (LU_alumno, id_dictado, fecha_calificacion, estado) VALUES (1, 3, curdate() - INTERVAL 20 DAY, "Aprobado");
-=======
+	INSERT INTO calificaciones_dictados (LU_alumno, id_dictado, fecha_calificacion, estado) VALUES (3, 1, curdate() - INTERVAL 330 DAY, "Desaprobado");
+	INSERT INTO calificaciones_dictados (LU_alumno, id_dictado, fecha_calificacion, estado) VALUES (2, 1, curdate() - INTERVAL 330 DAY, "Aprobado");
+
+	/* meses de examen */
+	INSERT INTO mesas_de_examen (legajo_profesor, id_materia, fecha_evaluacion,hora_evaluacion) VALUES (2, 1, curdate() - INTERVAL 330 DAY, "12:00");
+	INSERT INTO mesas_de_examen (legajo_profesor, id_materia, fecha_evaluacion,hora_evaluacion) VALUES (2, 1, curdate() - INTERVAL 300 DAY, "12:00");
+	/*inscripcion de final*/
+	INSERT INTO inscripciones_finales (LU_alumno, id_mesa, fecha_inscripcion) VALUES (1, 1, curdate() - INTERVAL 336 DAY);
+	INSERT INTO inscripciones_finales (LU_alumno, id_mesa, fecha_inscripcion) VALUES (2, 1, curdate() - INTERVAL 336 DAY);
+	INSERT INTO inscripciones_finales (LU_alumno, id_mesa, fecha_inscripcion) VALUES (3, 2, curdate() - INTERVAL 336 DAY);
+	INSERT INTO inscripciones_finales (LU_alumno, id_mesa, fecha_inscripcion) VALUES (4, 2, curdate() - INTERVAL 336 DAY);
+	/*calificacion finales */
+	INSERT INTO calificaciones_finales (LU_alumno, id_mesa, fecha_calificacion,estado,puntaje) VALUES (1, 1, curdate() - INTERVAL 330 DAY,"aprobado",9);
+	INSERT INTO calificaciones_finales (LU_alumno, id_mesa, fecha_calificacion,estado,puntaje) VALUES (2, 1, curdate() - INTERVAL 330 DAY,"desaprobado",2);
+	INSERT INTO calificaciones_finales (LU_alumno, id_mesa, fecha_calificacion,estado,puntaje) VALUES (3, 2, curdate() - INTERVAL 300 DAY,"aprobado",7);
+	INSERT INTO calificaciones_finales (LU_alumno, id_mesa, fecha_calificacion,estado,puntaje) VALUES (4, 2, curdate() - INTERVAL 300 DAY,"aprobado",5);
 USE `universidad` ; 
 
 /* Alumnos */
@@ -192,4 +212,3 @@ USE `universidad` ;
 	INSERT INTO profesores (matricula, dni, cuil, nombre, apellido, genero) VALUES (4444, 40, 404444, "Ana", "Diaz", "Femenino");
 	
 	
->>>>>>> refs/remotes/origin/main

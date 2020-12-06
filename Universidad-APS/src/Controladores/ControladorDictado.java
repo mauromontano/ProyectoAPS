@@ -8,7 +8,10 @@ import java.util.List;
 import Conector.DriverBD;
 import Excepciones.DBRetrieveException;
 import Excepciones.DBUpdateException;
+import Modelos.ActaCursado;
+import Modelos.ActaFinal;
 import Modelos.Dictado;
+import Modelos.MesaDeExamen;
 import Modelos.Modelo;
 import Modelos.Profesor;
 import quick.dbtable.DBTable;
@@ -380,5 +383,125 @@ private static ControladorDictado instancia = null;
 		}
 	}
 	
+	
+	
+	//---------------------Lautaro-------------------
+	public List<ActaCursado> recuperarActaCursados (int id_dictado) throws DBRetrieveException {
+		
+		
+		List<ActaCursado> listaActaCursados = new LinkedList<ActaCursado>();
+		
+		ResultSet rs;
+		ActaCursado actaCursado = null;
+		String sentenciaSQL;
+		String mensajeError = null;	
+		boolean solicitudExitosa = true;		
+		try
+		{		
+			sentenciaSQL = "SELECT LU,nombre,apellido,estado from calificaciones_dictados,alumnos where LU_alumno=LU and id_dictado="+id_dictado+";";
+			
+			DriverBD.driver().nuevaConexion();
+			rs = DriverBD.driver().consultar(sentenciaSQL);
+			while (rs.next()) {
+				actaCursado = ActaCursado.extraerModelo(rs);
+				listaActaCursados.add(actaCursado);
+			}
+			DriverBD.driver().cerrarConexion();
+		}
+		catch (SQLException ex)
+		{
+			solicitudExitosa = false;
+			mensajeError = ex.getMessage();
+		}
+
+		if (!solicitudExitosa) {
+			throw new DBRetrieveException("¡ERROR! falló la recuperación las calificaciones dictado para el dictado con ID: " +
+					id_dictado+".\n" +
+					"Detalle: " + mensajeError);
+		}
+		return listaActaCursados;
+	}
+	
+	
+	public List<MesaDeExamen> mesasMateriaPorProfesor(int idMat, int lg) throws DBRetrieveException {
+	
+		List<MesaDeExamen> listaMesas = new LinkedList<MesaDeExamen>();
+		ResultSet rs;
+		MesaDeExamen mesa = null;
+		String sentenciaSQL;
+		String mensajeError = null;	
+		boolean solicitudExitosa = true;
+		try
+		{
+			sentenciaSQL = "SELECT *\r\n" + 
+					"FROM mesas_de_examen\r\n" + 
+					"WHERE (\r\n" + 
+					"		legajo_profesor = " + lg + "\r\n" + 
+					"		AND\r\n" + 
+					"		id_materia = " + idMat + "\r\n" + 
+					");";
+			
+			DriverBD.driver().nuevaConexion();
+			rs = DriverBD.driver().consultar(sentenciaSQL);			
+			while (rs.next()) {
+				mesa = MesaDeExamen.extraerModelo(rs);
+				listaMesas.add(mesa);
+			}
+			DriverBD.driver().cerrarConexion();
+		}
+		catch (SQLException ex)
+		{
+			solicitudExitosa = false;
+			mensajeError = ex.getMessage();
+		}
+
+		if (!solicitudExitosa) {
+			throw new DBRetrieveException("¡ERROR! falló la recuperación los dictados de la materia con ID: " +
+					idMat + " del profesor con legajo: " + lg + ".\n" +
+					"Detalle: " + mensajeError);
+		}
+		return listaMesas;
+	}
+	
+	
+public List<ActaFinal> recuperarActaFinal (int id_mesa) throws DBRetrieveException {
+		
+		
+		List<ActaFinal> listaActaFinales = new LinkedList<ActaFinal>();
+		
+		ResultSet rs;
+		ActaFinal actaFinal = null;
+		String sentenciaSQL;
+		String mensajeError = null;	
+		boolean solicitudExitosa = true;		
+		try
+		{		
+			sentenciaSQL = "SELECT LU,nombre,apellido,puntaje from calificaciones_finales,alumnos where LU_alumno=LU and id_mesa="+id_mesa+";";
+			
+			DriverBD.driver().nuevaConexion();
+			rs = DriverBD.driver().consultar(sentenciaSQL);
+			while (rs.next()) {
+				actaFinal = ActaFinal.extraerModelo(rs);
+				listaActaFinales.add(actaFinal);
+			}
+			DriverBD.driver().cerrarConexion();
+		}
+		catch (SQLException ex)
+		{
+			solicitudExitosa = false;
+			mensajeError = ex.getMessage();
+		}
+
+		if (!solicitudExitosa) {
+			throw new DBRetrieveException("¡ERROR! falló la recuperación las calificaciones finales para la mesa con ID: " +
+					id_mesa+".\n" +
+					"Detalle: " + mensajeError);
+		}
+		return listaActaFinales;
+	}
+	
+	
+	
+	//---------------------------------------------
 
 }

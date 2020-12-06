@@ -58,7 +58,7 @@ public class VistaProfesor extends VistaHome {
 		
 		JPanel panel = new JPanel();
 		panel.setBorder(new LineBorder(SystemColor.activeCaptionBorder));
-		panel.setBounds(472, 204, 256, 207);
+		panel.setBounds(472, 204, 256, 291);
 		add(panel);
 		panel.setLayout(null);
 		
@@ -93,6 +93,41 @@ public class VistaProfesor extends VistaHome {
 		btnCalificarExamenFinal.setBounds(47, 149, 166, 31);
 		panel.add(btnCalificarExamenFinal);
 		
+		
+	//------------------------Lautaro------------------------------------------------------
+		JButton btnGenerarActaCursado = new JButton("Generar Acta Cursado");
+		btnGenerarActaCursado.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				
+				VistaReporteActaCursado.vista().generarVistaReporteActaCursado(modeloProfesor);
+				
+				ControladorVistas.controlador().mostrar(VistaReporteActaCursado.vista());
+				
+				
+			}
+		});
+		btnGenerarActaCursado.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+		btnGenerarActaCursado.setBounds(47, 191, 166, 31);
+		panel.add(btnGenerarActaCursado);
+		
+		JButton btnGenerarActaFinal = new JButton("Generar Acta Final");
+		btnGenerarActaFinal.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				
+				
+				VistaReporteActaFinal.vista().generarVistaReporteActaFinal(modeloProfesor);
+				ControladorVistas.controlador().mostrar(VistaReporteActaFinal.vista());
+				
+			}
+		});
+		btnGenerarActaFinal.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+		btnGenerarActaFinal.setBounds(47, 233, 166, 31);
+		panel.add(btnGenerarActaFinal);
+		
+		//-----------------------------------------------------------------
+		
+		
 		JButton btnRegistrarMesa = new JButton("Nueva mesa de final");
 		btnRegistrarMesa.setBounds(47, 23, 166, 31);
 		panel.add(btnRegistrarMesa);
@@ -102,6 +137,9 @@ public class VistaProfesor extends VistaHome {
 			}
 		});
 		btnRegistrarMesa.setFont(new Font("Microsoft YaHei UI Light", Font.PLAIN, 13));
+		
+		
+		
 	}
 	
 	

@@ -19,8 +19,6 @@ CREATE SCHEMA IF NOT EXISTS `universidad` DEFAULT CHARACTER SET utf8 ;
 USE `universidad` ;
 
 -- -----------------------------------------------------
-<<<<<<< HEAD
-=======
 -- Table `universidad`.`profesores`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `universidad`.`profesores` ;
@@ -39,7 +37,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
->>>>>>> refs/remotes/origin/main
 -- Table `universidad`.`alumnos`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `universidad`.`alumnos` ;
@@ -120,8 +117,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
-<<<<<<< HEAD
-=======
 -- Table `universidad`.`inscripciones`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `universidad`.`inscripciones_carreras` ;
@@ -170,7 +165,6 @@ ENGINE = InnoDB;
 
 
 -- -----------------------------------------------------
->>>>>>> refs/remotes/origin/main
 -- Table `universidad`.`planes`
 -- -----------------------------------------------------
 DROP TABLE IF EXISTS `universidad`.`planes` ;
@@ -220,8 +214,6 @@ CREATE TABLE IF NOT EXISTS `universidad`.`correlativas` (
    CONSTRAINT `fk_correlativa`
     FOREIGN KEY (`id_correlativa`)  REFERENCES `universidad`.`materias` (`id`)
     ON DELETE NO ACTION
-<<<<<<< HEAD
-=======
     ON UPDATE NO ACTION,
 	CONSTRAINT `fk_plan_asociado`
     FOREIGN KEY (`id_plan`)  REFERENCES `universidad`.`planes` (`id` )
@@ -239,6 +231,7 @@ DROP TABLE IF EXISTS `universidad`.`notas` ;
 CREATE TABLE IF NOT EXISTS `universidad`.`notas` (
   `LU_alumnos` INT UNSIGNED NOT NULL,
   `id_materia` INT UNSIGNED NOT NULL,
+   `id_plan` INT UNSIGNED NOT NULL,
   `fecha_evaluacion` DATE NOT NULL,
   `puntaje` INT UNSIGNED NOT NULL,
   `estado` VARCHAR(25) NOT NULL,
@@ -248,9 +241,8 @@ CREATE TABLE IF NOT EXISTS `universidad`.`notas` (
     FOREIGN KEY (`LU_alumnos`)
     REFERENCES `universidad`.`alumnos` (`LU`)
     ON DELETE NO ACTION
->>>>>>> refs/remotes/origin/main
     ON UPDATE NO ACTION,
-	CONSTRAINT `fk_plan_asociado`
+	CONSTRAINT `fk_plan_asociado_notas`
     FOREIGN KEY (`id_plan`)  REFERENCES `universidad`.`planes` (`id` )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)

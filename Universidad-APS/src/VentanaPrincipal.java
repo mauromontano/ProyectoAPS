@@ -48,6 +48,8 @@ public class VentanaPrincipal extends JFrame {
 		getContentPane().add(VistaAdminPlanes.vista());
 		getContentPane().add(VistaAdminMaterias.vista());
 		getContentPane().add(VistaAdminDictados.vista());
+		getContentPane().add(VistaReporteActaCursado.vista());
+		getContentPane().add(VistaReporteActaFinal.vista());
 		
 		ControladorVistas.controlador();
 		VistaAlumno.vista().setVisible(false);
@@ -60,6 +62,8 @@ public class VentanaPrincipal extends JFrame {
 		VistaAdminPlanes.vista().setVisible(false);
 		VistaAdminMaterias.vista().setVisible(false);
 		VistaAdminDictados.vista().setVisible(false);
+		VistaReporteActaCursado.vista().setVisible(false);
+		VistaReporteActaFinal.vista().setVisible(false);
 		
 	}
 	

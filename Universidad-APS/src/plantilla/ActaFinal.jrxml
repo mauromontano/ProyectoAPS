@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="ActaFinal" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="883cdc7d-6819-461d-b294-2786957d095b">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<parameter name="materia" class="java.lang.String"/>
+	<parameter name="fecha" class="java.lang.String"/>
+	<parameter name="profesor" class="java.lang.String"/>
+	<field name="LU" class="java.lang.Integer"/>
+	<field name="nombre" class="java.lang.String"/>
+	<field name="apellido" class="java.lang.String"/>
+	<field name="nota" class="java.lang.Integer"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="88" splitType="Stretch">
+			<staticText>
+				<reportElement x="229" y="0" width="100" height="20" uuid="36f21981-4142-45a6-a169-59d2e1044b95"/>
+				<textElement>
+					<font size="15" isBold="true" isItalic="true" isUnderline="true"/>
+				</textElement>
+				<text><![CDATA[Acta Final]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="44" width="49" height="20" uuid="7cc68ea7-dd07-4923-a026-d088da49cfb2"/>
+				<text><![CDATA[Fecha:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="24" width="49" height="20" uuid="5e768977-a637-41f5-987e-c18b3184300f"/>
+				<text><![CDATA[Materia:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="64" width="49" height="20" uuid="94e72c4b-6ce6-4698-aaf1-9d08f3a1a069"/>
+				<text><![CDATA[Profesor:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="49" y="24" width="100" height="20" uuid="938c801e-6d30-4cf9-ae41-6b43de2ff75c"/>
+				<textFieldExpression><![CDATA[$P{materia}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="49" y="44" width="100" height="20" uuid="809efebd-b15f-4c8c-aa14-72db0f13bf74"/>
+				<textFieldExpression><![CDATA[$P{fecha}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="49" y="64" width="100" height="20" uuid="7f8712ae-d242-4a6d-b011-05f4dfb51f88"/>
+				<textFieldExpression><![CDATA[$P{profesor}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement x="25" y="0" width="100" height="20" uuid="298ce7b3-a49c-43b9-82a8-535840bc35a5"/>
+				<text><![CDATA[LU]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="149" y="0" width="100" height="20" uuid="ce4a2e98-4bfd-4e21-965a-3019bd1778b6"/>
+				<text><![CDATA[Nombre]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="283" y="0" width="100" height="20" uuid="ea91d707-961b-4a0e-a579-05c7a4e6f21d"/>
+				<text><![CDATA[Apellido]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="419" y="0" width="100" height="20" uuid="42509d0c-aa85-44c8-9618-7f6f5fc433f9"/>
+				<text><![CDATA[Nota]]></text>
+			</staticText>
+			<line>
+				<reportElement x="0" y="22" width="555" height="1" uuid="9e2ca4a5-2932-4693-89d2-c265ef26e1ad"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="24" splitType="Stretch">
+			<textField>
+				<reportElement x="25" y="3" width="100" height="20" uuid="2759896c-95d0-4c85-a523-b26ace16d3a9"/>
+				<textFieldExpression><![CDATA[$F{LU}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="149" y="0" width="100" height="20" uuid="1fd5f4cf-2e3d-482e-9ace-abe2fb024838"/>
+				<textFieldExpression><![CDATA[$F{nombre}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="419" y="0" width="100" height="20" uuid="051afb5b-396e-437f-bee8-93f26ef85285"/>
+				<textFieldExpression><![CDATA[$F{nota}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="283" y="3" width="100" height="20" uuid="110d2773-1e71-4de7-a2e1-da427974c426"/>
+				<textFieldExpression><![CDATA[$F{apellido}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="0" y="23" width="555" height="1" uuid="b0f917c4-3d5d-464d-828b-c9b6e34d2bd4"/>
+			</line>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
